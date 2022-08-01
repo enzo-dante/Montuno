@@ -73,6 +73,20 @@ class DatasourceTest {
     }
 
     @Test
+    void createViewForSongArtists_success() {
+        boolean actual = datasource.createViewForSongArtists();
+        assertTrue(actual);
+    }
+
+    @Test
+    void createViewForSongArtists_fail() {
+        datasource.close();
+        boolean actual = datasource.createViewForSongArtists();
+        assertFalse(actual);
+    }
+
+
+    @Test
     void queryArtist_success() {
         List<Artist> artists = datasource.queryArtist(Datasource.ORDER_BY_NONE);
         assertNotNull(artists);
@@ -134,9 +148,30 @@ class DatasourceTest {
     }
 
     @Test
+    void insertIntoSongs_success() {
+        boolean actual = datasource.insertIntoSongs(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD, TEST_ALBUM_IN_THE_DARK, 1);
+        assertFalse(actual);
+    }
+
+    @Test
+    void insertIntoSongs_fail_dbClosed() {
+        datasource.close();
+
+        boolean actual = datasource.insertIntoSongs(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD, TEST_ALBUM_IN_THE_DARK, 1);
+        assertFalse(actual);
+    }
+
+    @Test
+    void insertIntoSongs_fail_duplicate() {
+        boolean actual = datasource.insertIntoSongs(TEST_SONG_HEARTLESS, TEST_ARTIST_GRATEFUL_DEAD, TEST_ALBUM_IN_THE_DARK, 1);
+        assertFalse(actual);
+    }
+
+
+    @Test
     void getCount_success() {
-        Integer actualResult = datasource.getCount(Datasource.TABLE_SONGS);
-        Integer expectedResult = 5350;
+        int actualResult = datasource.getCount(Datasource.TABLE_SONGS);
+        int expectedResult = 5351;
         assertEquals(expectedResult, actualResult, 10);
     }
 
@@ -173,19 +208,6 @@ class DatasourceTest {
     }
 
     @Test
-    void createViewForSongArtists_success() {
-        boolean actual = datasource.createViewForSongArtists();
-        assertTrue(actual);
-    }
-
-    @Test
-    void createViewForSongArtists_fail() {
-        datasource.close();
-        boolean actual = datasource.createViewForSongArtists();
-        assertFalse(actual);
-    }
-
-    @Test
     void querySongInfoView_success() {
         List<SongArtist> actual = datasource.querySongInfoView(TEST_SONG_HEARTLESS);
         assertNotNull(actual);
@@ -217,29 +239,8 @@ class DatasourceTest {
     }
 
     @Test
-    void insertIntoSongs_success() {
-        datasource.deleteSong(TEST_SONG_HEARTLESS);
-        boolean actual = datasource.insertIntoSongs(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD, TEST_ALBUM_IN_THE_DARK, 1);
-        assertTrue(actual);
-    }
-
-    @Test
-    void insertIntoSongs_fail_dbClosed() {
-        datasource.close();
-
-        boolean actual = datasource.insertIntoSongs(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD, TEST_ALBUM_IN_THE_DARK, 1);
-        assertFalse(actual);
-    }
-
-    @Test
-    void insertIntoSongs_fail_duplicate() {
-        boolean actual = datasource.insertIntoSongs(TEST_SONG_HEARTLESS, TEST_ARTIST_GRATEFUL_DEAD, TEST_ALBUM_IN_THE_DARK, 1);
-        assertFalse(actual);
-    }
-
-    @Test
     void updateArtist_success() {
-        assertTrue(datasource.updateArtistName(2, TEST_ARTIST_IRON_MAIDEN));
+        assertTrue(datasource.updateArtistName(66, "AC DC"));
     }
 
     @Test
@@ -257,28 +258,4 @@ class DatasourceTest {
     void updateArtist_badInputName() {
         assertFalse(datasource.updateArtistName(1, ""));
     }
-
-    @Test
-    void deleteSong_success() {
-        datasource.insertIntoSongs(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD, TEST_ALBUM_IN_THE_DARK, 1);
-        assertTrue(datasource.deleteSong(TEST_SONG_TOUCH_GREY));
-        assertEquals(5350, datasource.getCount(Datasource.TABLE_SONGS));
-    }
-
-    @Test
-    void deleteSong_missingSong() {
-        assertFalse(datasource.deleteSong(TEST));
-    }
-
-    @Test
-    void deleteSong_badConnection() {
-        datasource.close();
-        assertFalse(datasource.deleteSong(TEST_SONG_HEARTLESS));
-    }
-
-    @Test
-    void deleteSong_badInput() {
-        assertFalse(datasource.deleteSong(""));
-    }
-
 }

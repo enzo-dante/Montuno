@@ -19,7 +19,7 @@ import java.util.List;
 public class Controller {
 
     // CONSTANTS/static class variables assigned FINAL value before compilation/instantiation
-    private static final String UPDATED_ARTIST_NAME = "AC DC";
+    private static final String UPDATED_ARTIST_NAME = "AC/DC (updated name)";
     private static final String NO_ARTIST_SELECTED = "No artist selected";
 
     /*

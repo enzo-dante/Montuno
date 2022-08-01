@@ -26,7 +26,7 @@ public class Datasource {
     private static final int SQL_START_INDEX = 1;
 
     public static final String DB_NAME = "music.db";
-    public static final String CONNECTION_STRING = "jdbc:sqlite:/Users/enzo_dante/git/java/projects/Montuno/" + DB_NAME;
+    public static final String CONNECTION_STRING = "jdbc:sqlite:/Users/enzo_dante/git/Montuno/" + DB_NAME;
 
     public static final String NO_CONNECTION = "Couldn't connect to database...\n";
     public static final String CLOSE_CONNECTION_FAIL = "Couldn't close() database...\n";
@@ -188,13 +188,9 @@ public class Datasource {
                     SET + COLUMN_ARTISTS_NAME + EQUALS + PLACEHOLDER_QUESTION_MARK +
                     WHERE + COLUMN_ARTISTS_ID + EQUALS + PLACEHOLDER_QUESTION_MARK;
 
-    public static final String DELETE_FROM_SONGS_PREP =
-            SELECT_ALL + TABLE_SONGS +
-                    WHERE + COLUMN_SONGS_TITLE + EQUALS + PLACEHOLDER_QUESTION_MARK;
-
     public static final String DELETE_FROM_SONGS =
             DELETE_FROM + TABLE_SONGS +
-                    WHERE + COLUMN_SONGS_TITLE + EQUALS + PLACEHOLDER_QUESTION_MARK;
+                    WHERE + COLUMN_SONGS_ID + EQUALS + PLACEHOLDER_QUESTION_MARK;
 
     // OOP ENCAPSULATION private class variables
     private Connection connection;
@@ -218,7 +214,6 @@ public class Datasource {
     private PreparedStatement updateArtistName;
 
     private PreparedStatement deleteFromSongs;
-    private PreparedStatement deleteFromSongsPrep;
 
     // lazy instantiation: only create instance using singleton pattern when instance is needed
     private static Datasource datasourceInstance = new Datasource();
@@ -260,7 +255,6 @@ public class Datasource {
 
             updateArtistName = connection.prepareStatement(UPDATE_ARTIST_NAME);
 
-            deleteFromSongsPrep = connection.prepareStatement(DELETE_FROM_SONGS_PREP);
             deleteFromSongs = connection.prepareStatement(DELETE_FROM_SONGS);
 
             return true;
@@ -293,10 +287,6 @@ public class Datasource {
 
             if (insertIntoSongs != null) {
                 insertIntoSongs.close();
-            }
-
-            if (deleteFromSongsPrep != null) {
-                deleteFromSongsPrep.close();
             }
 
             if (deleteFromSongs != null) {
@@ -402,7 +392,7 @@ public class Datasource {
      */
     public boolean testProgressBar() {
         try {
-            Thread.sleep(20);
+            Thread.sleep(10);
             return true;
         } catch(InterruptedException e) {
             System.out.println(e.getMessage());
@@ -740,7 +730,7 @@ public class Datasource {
     /**
      * get list of songArtists via artist_list view
      *
-     * @return if SQL SELECTquery was successful
+     * @return if SQL SELECT query was successful
      */
     public List<SongArtist> querySongInfoView(String title) {
 
@@ -927,34 +917,6 @@ public class Datasource {
 
         } catch(SQLException e) {
             System.out.println(UPDATE_FAILED + e.getMessage());
-            return false;
-        }
-
-    }
-
-    public boolean deleteSong(String songName) {
-
-        if(songName.isEmpty()) {
-            return false;
-        }
-
-        try {
-
-            querySongs.setString(1, songName);
-            ResultSet resultSet = querySongs.executeQuery();
-
-            if(resultSet.next()) {
-                deleteFromSongs.setString(1, songName);
-
-                int deletedRecords = deleteFromSongs.executeUpdate();
-
-                return deletedRecords == 1;
-            }
-
-            return false;
-
-        } catch(SQLException e) {
-            System.out.println(DELETE_FAILED + e.getMessage());
             return false;
         }
     }
