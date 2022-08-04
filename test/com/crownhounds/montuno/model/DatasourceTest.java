@@ -33,6 +33,7 @@ class DatasourceTest {
     @BeforeAll
     static void beforeAll() {
         System.out.println(BEFORE_ALL_TESTS);
+        assertTrue(Datasource.createArtistListViewForSongArtists());
     }
 
     @AfterAll
@@ -73,23 +74,11 @@ class DatasourceTest {
     }
 
     @Test
-    void createViewForSongArtists_success() {
-        boolean actual = datasource.createViewForSongArtists();
-        assertTrue(actual);
-    }
-
-    @Test
-    void createViewForSongArtists_fail() {
-        datasource.close();
-        boolean actual = datasource.createViewForSongArtists();
-        assertFalse(actual);
-    }
-
-
-    @Test
     void queryArtist_success() {
         List<Artist> artists = datasource.queryArtist(Datasource.ORDER_BY_NONE);
         assertNotNull(artists);
+
+        System.out.println("----------------");
 
         for (Artist artist : artists) {
             System.out.println(Datasource.ARTIST_NAME + artist.getName() + "\n" +
@@ -192,6 +181,7 @@ class DatasourceTest {
         List<SongArtist> songArtists = datasource.queryArtistForSong(TEST_SONG_HEARTLESS, 2);
         assertNotNull(songArtists);
 
+        System.out.println("----------------");
         Datasource.printSongArtists(songArtists);
     }
 
@@ -208,18 +198,19 @@ class DatasourceTest {
     }
 
     @Test
-    void querySongInfoView_success() {
-        List<SongArtist> actual = datasource.querySongInfoView(TEST_SONG_HEARTLESS);
+    void queryArtistListView_success() {
+        List<SongArtist> actual = datasource.queryArtistListView(TEST_SONG_HEARTLESS);
         assertNotNull(actual);
 
+        System.out.println("----------------");
         Datasource.printSongArtists(actual);
     }
 
     @Test
-    void querySongInfoView_fail() {
+    void queryArtistListView_fail() {
         datasource.close();
 
-        List<SongArtist> actual = datasource.querySongInfoView(TEST_SONG_HEARTLESS);
+        List<SongArtist> actual = datasource.queryArtistListView(TEST_SONG_HEARTLESS);
         assertNull(actual);
     }
 
@@ -273,7 +264,10 @@ class DatasourceTest {
 
     @Test
     void deleteSong_badInput() {
-        fail(NOT_IMPLEMENTED_FAIL);
+        String testArtist = "";
+        String testSong = "";
 
+        boolean actual = datasource.deleteSong(testSong, testArtist);
+        assertFalse(actual);
     }
 }

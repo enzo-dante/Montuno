@@ -6,6 +6,8 @@ public class SongArtist {
     private String artistName;
     private String albumName;
     private Integer track;
+    private String songTitle;
+    private Integer song_id;
 
     // OOP setters & getters
     public String getArtistName() {
@@ -30,5 +32,21 @@ public class SongArtist {
 
     public void setTrack(Integer track) {
         this.track = track;
+    }
+
+    public String getSongTitle() {
+        return songTitle;
+    }
+
+    public void setSongTitle(String songTitle) {
+        this.songTitle = songTitle;
+    }
+
+    public Integer getSong_id() {
+        return song_id;
+    }
+
+    public void setSong_id(Integer song_id) {
+        this.song_id = song_id;
     }
 }

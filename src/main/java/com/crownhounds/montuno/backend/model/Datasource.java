@@ -10,7 +10,7 @@ public class Datasource {
     private static final String UPDATE_FAILED = "Update failed: ";
     private static final String DELETE_FAILED = "Delete failed: ";
     private static final String CREATE_VIEW_FAILED = "Create View failed: ";
-    private static final String QUERY_SONG_INFO_VIEW_FAILED = "querySongInfoView failed: ";
+    private static final String QUERY_ARTIST_LIST_VIEW_FAILED = "queryArtistListView failed: ";
     private static final String INSERT_ARTIST_FAIL = "Couldn't insert artist!";
     private static final String GET_ARTIST_FAIL = "Couldn't get _id for artist!";
     private static final String INSERT_ALBUM_FAIL = "Couldn't insert album!";
@@ -38,10 +38,14 @@ public class Datasource {
     private static final int INDEX_ALBUM_ID = 1;
     private static final int INDEX_ALBUM_NAME = 2;
 
+    // SongArtist member fields
     public static final String ARTIST_NAME = "Artist Name: ";
     public static final String ARTIST_ID = "Artist ID: ";
     public static final String ALBUM_NAME = "Album Name: ";
     public static final String TRACK_NUMBER = "Track: ";
+    public static final String SONG_TITLE = "Song Title: ";
+    public static final String SONG_ID = "Song ID: ";
+    public static final String COLUMN_ARTIST_LIST_SONG_ID = "song_id";
 
     public static final String TABLE_ARTISTS = "artists";
     public static final String COLUMN_ARTISTS_ID = "_id";
@@ -105,9 +109,12 @@ public class Datasource {
             ORDER_BY + TABLE_ALBUMS + PERIOD + COLUMN_ALBUMS_NAME + COLLATE_NO_CASE;
 
     public static final String QUERY_ARTISTS_FOR_SONGS_START =
-            SELECT + TABLE_ARTISTS + PERIOD + COLUMN_ARTISTS_NAME + COMMA +
+            SELECT +
+                    TABLE_ARTISTS + PERIOD + COLUMN_ARTISTS_NAME + COMMA +
                     TABLE_ALBUMS + PERIOD + COLUMN_ALBUMS_NAME + COMMA +
-                    TABLE_SONGS + PERIOD + COLUMN_SONGS_TRACK +
+                    TABLE_SONGS + PERIOD + COLUMN_SONGS_TRACK + COMMA +
+                    TABLE_SONGS + PERIOD + COLUMN_SONGS_TITLE + COMMA +
+                    TABLE_SONGS + PERIOD + COLUMN_SONGS_ID +
                     FROM + TABLE_SONGS +
                     INNER_JOIN + TABLE_ALBUMS +
                     ON + TABLE_SONGS + PERIOD + COLUMN_SONGS_ALBUM + EQUALS + TABLE_ALBUMS + PERIOD + COLUMN_ALBUMS_ID +
@@ -118,12 +125,13 @@ public class Datasource {
     public static final String QUERY_ARTISTS_FOR_SONGS_SORT =
             ORDER_BY + TABLE_ARTISTS + PERIOD + COLUMN_ARTISTS_NAME + COMMA + TABLE_SONGS + PERIOD + COLUMN_SONGS_TITLE + COLLATE_NO_CASE;
 
-    public static final String CREATE_ARTIST_FOR_SONG_VIEW =
+    public static final String CREATE_ARTIST_LIST_VIEW =
             CREATE_VIEW_IF_NOT_EXISTS + TABLE_ARTIST_LIST_VIEW + VIEW_AS_SELECT +
                     TABLE_ARTISTS + PERIOD + COLUMN_ARTISTS_NAME + COMMA +
                     TABLE_ALBUMS + PERIOD + COLUMN_ALBUMS_NAME + AS + COLUMN_SONGS_ALBUM + COMMA +
                     TABLE_SONGS + PERIOD + COLUMN_SONGS_TRACK + COMMA +
-                    TABLE_SONGS + PERIOD + COLUMN_SONGS_TITLE +
+                    TABLE_SONGS + PERIOD + COLUMN_SONGS_TITLE + COMMA +
+                    TABLE_SONGS + PERIOD + COLUMN_SONGS_ID + AS + COLUMN_ARTIST_LIST_SONG_ID +
                     FROM + TABLE_SONGS +
                     INNER_JOIN + TABLE_ALBUMS +
                     ON + TABLE_SONGS + PERIOD + COLUMN_SONGS_ALBUM + EQUALS + TABLE_ALBUMS + PERIOD + COLUMN_ALBUMS_ID +
@@ -135,11 +143,13 @@ public class Datasource {
 
     // ? = placeholder for title
     // SQL statement: SELECT name, album, track FROM artist_list WHERE title = ?
-    public static final String QUERY_SONG_INFO_VIEW_PREP =
+    public static final String QUERY_ARTIST_LIST_VIEW =
             SELECT +
                     COLUMN_ARTISTS_NAME + COMMA +
                     COLUMN_SONGS_ALBUM + COMMA +
-                    COLUMN_SONGS_TRACK +
+                    COLUMN_SONGS_TRACK + COMMA +
+                    COLUMN_SONGS_TITLE + COMMA +
+                    COLUMN_ARTIST_LIST_SONG_ID +
                     FROM + TABLE_ARTIST_LIST_VIEW +
                     WHERE + COLUMN_SONGS_TITLE + EQUALS + PLACEHOLDER_QUESTION_MARK;
 
@@ -191,7 +201,7 @@ public class Datasource {
         helpful for performance and protecting against SQL Injection Attacks
         PreparedStatement is a subclass of Statement
      */
-    private PreparedStatement querySongInfoView;
+    private PreparedStatement queryArtistListView;
     private PreparedStatement queryArtists;
     private PreparedStatement queryAlbums;
     private PreparedStatement querySongs;
@@ -232,7 +242,7 @@ public class Datasource {
 
                 queryArtistListView = connection.prepareStatement(QUERY_ARTIST_LIST_PREPARED_STATEMENT);
              */
-            querySongInfoView = connection.prepareStatement(QUERY_SONG_INFO_VIEW_PREP);
+            queryArtistListView = connection.prepareStatement(QUERY_ARTIST_LIST_VIEW);
             queryArtists = connection.prepareStatement(QUERY_ARTISTS);
             queryAlbums = connection.prepareStatement(QUERY_ALBUMS);
             querySongs = connection.prepareStatement(QUERY_SONGS);
@@ -370,7 +380,9 @@ public class Datasource {
         for (SongArtist artist : songArtists) {
             System.out.println(ARTIST_NAME + artist.getArtistName() + "\n" +
                     ALBUM_NAME + artist.getAlbumName() + "\n" +
-                    TRACK_NUMBER + artist.getTrack());
+                    TRACK_NUMBER + artist.getTrack() + "\n" +
+                    SONG_TITLE + artist.getTrack() + "\n" +
+                    SONG_ID + artist.getSong_id());
         }
     }
 
@@ -480,6 +492,8 @@ public class Datasource {
                 songArtist.setArtistName(resultSet.getString(1));
                 songArtist.setAlbumName(resultSet.getString(2));
                 songArtist.setTrack(resultSet.getInt(3));
+                songArtist.setSongTitle(resultSet.getString(4));
+                songArtist.setSong_id(resultSet.getInt(5));
 
                 songArtists.add(songArtist);
             }
@@ -495,16 +509,16 @@ public class Datasource {
      * ! OVERLOADED METHOD: same name method w/ unique parameters that optimize readability & scalability
      * get list of songArtist
      *
-     * @param querySongInfoView the SQL for the artist_list view
+     * @param queryArtistListView the SQL for the artist_list view
      * @param title song title
      * @return list of songArtists
      */
-    public List<SongArtist> buildSongArtists(PreparedStatement querySongInfoView, String title) {
+    public List<SongArtist> buildSongArtists(PreparedStatement queryArtistListView, String title) {
 
         try {
             // JDBC list starts at 1 not 0
-            querySongInfoView.setString(1, title);
-            ResultSet resultSet = querySongInfoView.executeQuery();
+            queryArtistListView.setString(1, title);
+            ResultSet resultSet = queryArtistListView.executeQuery();
 
             // ! INTERFACE: an abstract collection of public signatures that designated classes MUST uniquely implement/@Override for standardization
             // ! GENERICS: improve OOP ENCAPSULATION by creating classes, interfaces, & methods that only take a specific dataType parameter
@@ -517,6 +531,8 @@ public class Datasource {
                 songArtist.setArtistName(resultSet.getString(1));
                 songArtist.setAlbumName(resultSet.getString(2));
                 songArtist.setTrack(resultSet.getInt(3));
+                songArtist.setSongTitle(resultSet.getString(4));
+                songArtist.setSong_id(resultSet.getInt(5));
 
                 songArtists.add(songArtist);
             }
@@ -699,13 +715,15 @@ public class Datasource {
      *
      * @return if SQL CREATE VIEW query was successful
      */
-    public boolean createViewForSongArtists() {
+    public static boolean createArtistListViewForSongArtists() {
 
-        try (Statement statement = connection.createStatement()) {
+        try (Statement statement = DriverManager.getConnection(CONNECTION_STRING).createStatement()) {
 
             // use .execute(sql.toString()) instead of .executeQuery(sql.toString()) given no return values
-            statement.execute(CREATE_ARTIST_FOR_SONG_VIEW);
+            statement.execute(CREATE_ARTIST_LIST_VIEW);
+            statement.close();
 
+            System.out.println("CREATED VIEW: artist_list\n");
             return true;
 
         } catch (SQLException e) {
@@ -719,16 +737,16 @@ public class Datasource {
      *
      * @return if SQL SELECT query was successful
      */
-    public List<SongArtist> querySongInfoView(String title) {
+    public List<SongArtist> queryArtistListView(String title) {
 
         // ! GENERICS: improve OOP ENCAPSULATION by creating classes, interfaces, & methods that only take a specific dataType parameter
-        List<SongArtist> results = buildSongArtists(querySongInfoView, title);
+        List<SongArtist> results = buildSongArtists(queryArtistListView, title);
 
         if (results != null && !results.isEmpty()) {
             return results;
         }
 
-        System.out.println(QUERY_SONG_INFO_VIEW_FAILED);
+        System.out.println(QUERY_ARTIST_LIST_VIEW_FAILED);
         return null;
     }
 
@@ -909,6 +927,11 @@ public class Datasource {
     }
 
     public boolean deleteSong(String song, String artist) {
+
+        if(song.isEmpty() || artist.isEmpty()) {
+            System.out.println(DELETE_FAILED);
+            return false;
+        }
 
         return false;
     }
