@@ -1,5 +1,7 @@
 # PR Code Change Description:
 
+![appRunAfter](resources/Montuno_appRunAfter.gif)
+
 ### frontend
 1. wrote controller that uses FXML to interface with JavaFX via main.fxml file
 2. manage SQLite3 database via SQL

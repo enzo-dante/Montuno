@@ -253,13 +253,17 @@ class DatasourceTest {
     @Test
     void deleteSong_true() {
         fail(NOT_IMPLEMENTED_FAIL);
-
+//        insertIntoSongs_success();
+//        boolean actual = datasource.deleteSong(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD);
+//        assertTrue(actual);
     }
 
     @Test
     void deleteSong_false() {
         fail(NOT_IMPLEMENTED_FAIL);
-
+//        insertIntoSongs_success();
+//        boolean actual = datasource.deleteSong(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD);
+//        assertTrue(actual);
     }
 
     @Test
