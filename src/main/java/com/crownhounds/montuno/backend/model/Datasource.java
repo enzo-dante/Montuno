@@ -133,17 +133,8 @@ public class Datasource {
                     TABLE_ALBUMS + PERIOD + COLUMN_ALBUMS_NAME + COMMA +
                     TABLE_SONGS + PERIOD + COLUMN_SONGS_TRACK + SEMICOLON;
 
-    public static final String QUERY_VIEW_SONG_INFO =
-            SELECT +
-                    COLUMN_ARTISTS_NAME + COMMA +
-                    COLUMN_SONGS_ALBUM + COMMA +
-                    COLUMN_SONGS_TRACK +
-                    FROM + TABLE_ARTIST_LIST_VIEW +
-                    WHERE + COLUMN_SONGS_TITLE + EQUALS;
-
     // ? = placeholder for title
     // SQL statement: SELECT name, album, track FROM artist_list WHERE title = ?
-
     public static final String QUERY_SONG_INFO_VIEW_PREP =
             SELECT +
                     COLUMN_ARTISTS_NAME + COMMA +
@@ -200,7 +191,6 @@ public class Datasource {
         helpful for performance and protecting against SQL Injection Attacks
         PreparedStatement is a subclass of Statement
      */
-    private PreparedStatement queryArtistListView;
     private PreparedStatement querySongInfoView;
     private PreparedStatement queryArtists;
     private PreparedStatement queryAlbums;
@@ -273,9 +263,6 @@ public class Datasource {
 
         // ! EXCEPTION HANDLING: EASY TO ASK FOR FORGIVENESS THAN PERMISSION (EAFTP) = use try-catch block
         try {
-            if (queryArtistListView != null) {
-                queryArtistListView.close();
-            }
 
             if (insertIntoArtists != null) {
                 insertIntoArtists.close();
@@ -508,16 +495,16 @@ public class Datasource {
      * ! OVERLOADED METHOD: same name method w/ unique parameters that optimize readability & scalability
      * get list of songArtist
      *
-     * @param preparedStatement
-     * @param title
+     * @param querySongInfoView the SQL for the artist_list view
+     * @param title song title
      * @return list of songArtists
      */
-    public List<SongArtist> buildSongArtists(PreparedStatement preparedStatement, String title) {
+    public List<SongArtist> buildSongArtists(PreparedStatement querySongInfoView, String title) {
 
         try {
             // JDBC list starts at 1 not 0
-            preparedStatement.setString(1, title);
-            ResultSet resultSet = preparedStatement.executeQuery();
+            querySongInfoView.setString(1, title);
+            ResultSet resultSet = querySongInfoView.executeQuery();
 
             // ! INTERFACE: an abstract collection of public signatures that designated classes MUST uniquely implement/@Override for standardization
             // ! GENERICS: improve OOP ENCAPSULATION by creating classes, interfaces, & methods that only take a specific dataType parameter
@@ -919,5 +906,10 @@ public class Datasource {
             System.out.println(UPDATE_FAILED + e.getMessage());
             return false;
         }
+    }
+
+    public boolean deleteSong(String song, String artist) {
+
+        return false;
     }
 }

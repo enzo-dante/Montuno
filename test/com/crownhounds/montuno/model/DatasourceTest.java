@@ -150,7 +150,7 @@ class DatasourceTest {
     @Test
     void insertIntoSongs_success() {
         boolean actual = datasource.insertIntoSongs(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD, TEST_ALBUM_IN_THE_DARK, 1);
-        assertFalse(actual);
+        assertTrue(actual);
     }
 
     @Test
@@ -257,5 +257,23 @@ class DatasourceTest {
     @Test
     void updateArtist_badInputName() {
         assertFalse(datasource.updateArtistName(1, ""));
+    }
+
+    @Test
+    void deleteSong_true() {
+        fail(NOT_IMPLEMENTED_FAIL);
+
+    }
+
+    @Test
+    void deleteSong_false() {
+        fail(NOT_IMPLEMENTED_FAIL);
+
+    }
+
+    @Test
+    void deleteSong_badInput() {
+        fail(NOT_IMPLEMENTED_FAIL);
+
     }
 }
