@@ -8,24 +8,20 @@
 3. current UI functionality: GET, UPDATE 
 
 ### backend
-1. added fields songTitle & song_id to SongArtist class
-2. added fields songTitle & song_id to CREATE_ARTIST_LIST_VIEW SQL string
-3. added fields songTitle & song_id to QUERY_ARTIST_LIST_VIEW SQL string
-4. added fields songTitle & song_id to SongArtist instances in printSongArtists() and buildSongArtists()
-5. updated anything that is SongArtist obj related like SONG_INFO_VIEW to ARTIST_LIST_VIEW
-6. updated DatasourceTest: createArtistListViewForSongArtists to static & moved test to static beforeAll()
-7. added resources dir to top level
-8. added to resources: SQLite driver, JavaFX driver, original music.db reference, and PR gifs
+1. added logic & tests to backend deleteSong() 
+2. saved all String instances in Datasource to a respective CONSTANT
+3. saved artist_list column indices as CONSTANTS
+4. created & separated logic & tests for SQL statements: QUERY_ARTIST_LIST_VIEW and QUERY_ARTIST_LIST_VIEW_BY_TITLE
+5. added deleteSong() to insertIntoSongs_success test to preserve music.db file
+6. updated getCount_success test to account for deleteSong() after insertIntoSongs_success test
 
 # Functional Impacts:
-1. prepared db table structure for deleteSong()
-2. automated createArtistListViewForSongArtists() on execution of DatasourceTest file
-3. easier to test music.db file
+1. can deleteSong() by SongArtist song_id from database after validating data first from artist_list view
 
 # QA Reminders:
 1. run DatasourceTest.java before starting application to create artist_list view
 2. use DB Browser for SQLite app for database viewing
-3. Datasource.deleteSong() is not implemented and should expect two failing tests
+3. there is a music_original.db backup file in resources dir if music.db is corrupted via testing 
 
 ### Pre-existing Bug
 1. clicking updateArtist button on "AC DC", viewing their albums,

@@ -9,6 +9,18 @@ public class SongArtist {
     private String songTitle;
     private Integer song_id;
 
+    // ! OOP POLYMORPHISM + INTERFACE: uniquely implement/@Override publicly shared method for designated classes
+    @Override
+    public String toString() {
+        return "SongArtist{" +
+                "artistName='" + artistName + '\'' +
+                ", albumName='" + albumName + '\'' +
+                ", track=" + track +
+                ", songTitle='" + songTitle + '\'' +
+                ", song_id=" + song_id +
+                '}';
+    }
+
     // OOP setters & getters
     public String getArtistName() {
         return this.artistName;

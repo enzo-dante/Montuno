@@ -3,14 +3,20 @@ package com.crownhounds.montuno.backend.model;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
 public class Datasource {
 
     // CONSTANTS/static class variables assigned FINAL value before compilation/instantiation
     private static final String QUERY_FAILED = "Query failed: ";
     private static final String UPDATE_FAILED = "Update failed: ";
     private static final String DELETE_FAILED = "Delete failed: ";
+    private static final String DELETE_FAILED_SIZE = DELETE_FAILED + "songArtists.size() != 1";
+    private static final String DELETED_SONG_ID = "DELETED song_id: ";
+    private static final String DELETED_FOR = " for:\n\t";
     private static final String CREATE_VIEW_FAILED = "Create View failed: ";
+    private static final String CREATED_VIEW_ARTIST_LIST = "CREATED VIEW: artist_list\n";
     private static final String QUERY_ARTIST_LIST_VIEW_FAILED = "queryArtistListView failed: ";
+    private static final String QUERY_ARTIST_FOR_SONG_SQL = "queryArtistForSong SQL:\n";
     private static final String INSERT_ARTIST_FAIL = "Couldn't insert artist!";
     private static final String GET_ARTIST_FAIL = "Couldn't get _id for artist!";
     private static final String INSERT_ALBUM_FAIL = "Couldn't insert album!";
@@ -24,6 +30,7 @@ public class Datasource {
 
     // ? ResultSet columns start at 1 and not 0
     private static final int SQL_START_INDEX = 1;
+    private static final String META_DATA_FORMAT = "Column %d in the songs table is names %s\n";
 
     public static final String DB_NAME = "music.db";
     public static final String CONNECTION_STRING = "jdbc:sqlite:/Users/enzo_dante/git/Montuno/" + DB_NAME;
@@ -45,7 +52,12 @@ public class Datasource {
     public static final String TRACK_NUMBER = "Track: ";
     public static final String SONG_TITLE = "Song Title: ";
     public static final String SONG_ID = "Song ID: ";
-    public static final String COLUMN_ARTIST_LIST_SONG_ID = "song_id";
+    private static final String COLUMN_ARTIST_LIST_SONG_ID = "song_id";
+    private static final int INDEX_ARTIST_LIST_SONG_ID = 5;
+    private static final int INDEX_ARTIST_LIST_SONG_TITLE = 4;
+    private static final int INDEX_ARTIST_LIST_SONG_TRACK = 3;
+    private static final int INDEX_ARTIST_LIST_ALBUM_NAME = 2;
+    private static final int INDEX_ARTIST_LIST_ARTIST_NAME = 1;
 
     public static final String TABLE_ARTISTS = "artists";
     public static final String COLUMN_ARTISTS_ID = "_id";
@@ -81,6 +93,7 @@ public class Datasource {
     private static final String PERIOD = ".";
     private static final String SEMICOLON = ";";
     private static final String AS = " AS ";
+    private static final String AND = " AND ";
     private static final String INSERT_INTO = "INSERT INTO ";
     private static final String DELETE_FROM = "DELETE FROM ";
 
@@ -144,14 +157,13 @@ public class Datasource {
     // ? = placeholder for title
     // SQL statement: SELECT name, album, track FROM artist_list WHERE title = ?
     public static final String QUERY_ARTIST_LIST_VIEW =
-            SELECT +
-                    COLUMN_ARTISTS_NAME + COMMA +
-                    COLUMN_SONGS_ALBUM + COMMA +
-                    COLUMN_SONGS_TRACK + COMMA +
-                    COLUMN_SONGS_TITLE + COMMA +
-                    COLUMN_ARTIST_LIST_SONG_ID +
-                    FROM + TABLE_ARTIST_LIST_VIEW +
-                    WHERE + COLUMN_SONGS_TITLE + EQUALS + PLACEHOLDER_QUESTION_MARK;
+            SELECT_ALL + TABLE_ARTIST_LIST_VIEW +
+                    WHERE + COLUMN_SONGS_TITLE + EQUALS + PLACEHOLDER_QUESTION_MARK + COLLATE_NO_CASE +
+                    AND + COLUMN_ARTISTS_NAME + EQUALS + PLACEHOLDER_QUESTION_MARK + COLLATE_NO_CASE;
+
+    public static final String QUERY_ARTIST_LIST_VIEW_BY_TITLE =
+            SELECT_ALL + TABLE_ARTIST_LIST_VIEW +
+                    WHERE + COLUMN_SONGS_TITLE + EQUALS + PLACEHOLDER_QUESTION_MARK + COLLATE_NO_CASE;
 
     public static final String INSERT_INTO_ARTISTS =
             INSERT_INTO + TABLE_ARTISTS +
@@ -202,6 +214,7 @@ public class Datasource {
         PreparedStatement is a subclass of Statement
      */
     private PreparedStatement queryArtistListView;
+    private PreparedStatement queryArtistListViewByTitle;
     private PreparedStatement queryArtists;
     private PreparedStatement queryAlbums;
     private PreparedStatement querySongs;
@@ -243,6 +256,8 @@ public class Datasource {
                 queryArtistListView = connection.prepareStatement(QUERY_ARTIST_LIST_PREPARED_STATEMENT);
              */
             queryArtistListView = connection.prepareStatement(QUERY_ARTIST_LIST_VIEW);
+            queryArtistListViewByTitle = connection.prepareStatement(QUERY_ARTIST_LIST_VIEW_BY_TITLE);
+
             queryArtists = connection.prepareStatement(QUERY_ARTISTS);
             queryAlbums = connection.prepareStatement(QUERY_ALBUMS);
             querySongs = connection.prepareStatement(QUERY_SONGS);
@@ -290,6 +305,14 @@ public class Datasource {
                 deleteFromSongs.close();
             }
 
+            if (queryArtistListView != null) {
+                queryArtistListView.close();
+            }
+
+            if (queryArtistListViewByTitle != null) {
+                queryArtistListViewByTitle.close();
+            }
+
             if (queryArtists != null) {
                 queryArtists.close();
             }
@@ -298,12 +321,12 @@ public class Datasource {
                 queryAlbums.close();
             }
 
-            if (querySongs != null) {
-                querySongs.close();
-            }
-
             if (queryAlbumsByArtistId != null) {
                 queryAlbumsByArtistId.close();
+            }
+
+            if (querySongs != null) {
+                querySongs.close();
             }
 
             if (updateArtistName != null) {
@@ -489,11 +512,11 @@ public class Datasource {
 
                 SongArtist songArtist = new SongArtist();
 
-                songArtist.setArtistName(resultSet.getString(1));
-                songArtist.setAlbumName(resultSet.getString(2));
-                songArtist.setTrack(resultSet.getInt(3));
-                songArtist.setSongTitle(resultSet.getString(4));
-                songArtist.setSong_id(resultSet.getInt(5));
+                songArtist.setArtistName(resultSet.getString(INDEX_ARTIST_LIST_ARTIST_NAME));
+                songArtist.setAlbumName(resultSet.getString(INDEX_ARTIST_LIST_ALBUM_NAME));
+                songArtist.setTrack(resultSet.getInt(INDEX_ARTIST_LIST_SONG_TRACK));
+                songArtist.setSongTitle(resultSet.getString(INDEX_ARTIST_LIST_SONG_TITLE));
+                songArtist.setSong_id(resultSet.getInt(INDEX_ARTIST_LIST_SONG_ID));
 
                 songArtists.add(songArtist);
             }
@@ -528,11 +551,11 @@ public class Datasource {
 
                 SongArtist songArtist = new SongArtist();
 
-                songArtist.setArtistName(resultSet.getString(1));
-                songArtist.setAlbumName(resultSet.getString(2));
-                songArtist.setTrack(resultSet.getInt(3));
-                songArtist.setSongTitle(resultSet.getString(4));
-                songArtist.setSong_id(resultSet.getInt(5));
+                songArtist.setArtistName(resultSet.getString(INDEX_ARTIST_LIST_ARTIST_NAME));
+                songArtist.setAlbumName(resultSet.getString(INDEX_ARTIST_LIST_ALBUM_NAME));
+                songArtist.setTrack(resultSet.getInt(INDEX_ARTIST_LIST_SONG_TRACK));
+                songArtist.setSongTitle(resultSet.getString(INDEX_ARTIST_LIST_SONG_TITLE));
+                songArtist.setSong_id(resultSet.getInt(INDEX_ARTIST_LIST_SONG_ID));
 
                 songArtists.add(songArtist);
             }
@@ -672,7 +695,7 @@ public class Datasource {
         StringBuilder sb = new StringBuilder(QUERY_ARTISTS_FOR_SONGS_START);
         sb.append(formatField(songName));
 
-        System.out.println("queryArtistForSong SQL:\n" + sb.toString());
+        System.out.println(QUERY_ARTIST_FOR_SONG_SQL + sb.toString());
 
         List<SongArtist> results = buildSongArtists(sb);
 
@@ -698,7 +721,7 @@ public class Datasource {
 
             for (int i = SQL_START_INDEX; i <= numColumns; i++) {
                 System.out.format(
-                        "Column %d in the songs table is names %s\n",
+                        META_DATA_FORMAT,
                         i,
                         metadata.getColumnName(i)
                 );
@@ -723,7 +746,7 @@ public class Datasource {
             statement.execute(CREATE_ARTIST_LIST_VIEW);
             statement.close();
 
-            System.out.println("CREATED VIEW: artist_list\n");
+            System.out.println(CREATED_VIEW_ARTIST_LIST);
             return true;
 
         } catch (SQLException e) {
@@ -737,10 +760,10 @@ public class Datasource {
      *
      * @return if SQL SELECT query was successful
      */
-    public List<SongArtist> queryArtistListView(String title) {
+    public List<SongArtist> queryArtistListViewByTitle(String title) {
 
         // ! GENERICS: improve OOP ENCAPSULATION by creating classes, interfaces, & methods that only take a specific dataType parameter
-        List<SongArtist> results = buildSongArtists(queryArtistListView, title);
+        List<SongArtist> results = buildSongArtists(queryArtistListViewByTitle, title);
 
         if (results != null && !results.isEmpty()) {
             return results;
@@ -906,6 +929,13 @@ public class Datasource {
             }
         }
     }
+
+    /**
+     * update artist name by SongArtist song_id from database after validating data first from artist_list view
+     * @param artistId
+     * @param updateName
+     * @return
+     */
     public boolean updateArtistName(int artistId, String updateName) {
 
         if(artistId < 0 || updateName.isEmpty()) {
@@ -926,6 +956,12 @@ public class Datasource {
         }
     }
 
+    /**
+     * delete song by SongArtist song_id from database after validating data first from artist_list view
+     * @param song
+     * @param artist
+     * @return SQL query success state
+     */
     public boolean deleteSong(String song, String artist) {
 
         if(song.isEmpty() || artist.isEmpty()) {
@@ -933,6 +969,53 @@ public class Datasource {
             return false;
         }
 
+        try {
+            queryArtistListView.setString(1, song.trim());
+            queryArtistListView.setString(2, artist.trim());
+
+            ResultSet resultSet = queryArtistListView.executeQuery();
+
+            // ! GENERICS: improve ENCAPSULATION by enforcing element dataType
+            ArrayList<SongArtist> songArtists = new ArrayList<>();
+
+            while(resultSet.next()) {
+                SongArtist songArtist = new SongArtist();
+
+                songArtist.setArtistName(resultSet.getString(INDEX_ARTIST_LIST_ARTIST_NAME));
+                songArtist.setAlbumName(resultSet.getString(INDEX_ARTIST_LIST_ALBUM_NAME));
+                songArtist.setTrack(resultSet.getInt(INDEX_ARTIST_LIST_SONG_TRACK));
+                songArtist.setSongTitle(resultSet.getString(INDEX_ARTIST_LIST_SONG_TITLE));
+                songArtist.setSong_id(resultSet.getInt(INDEX_ARTIST_LIST_SONG_ID));
+
+                songArtists.add(songArtist);
+            }
+
+            // ! EXCEPTION HANDLING: LOOK BEFORE YOU LEAP (LBYL) = use conditional if-else block
+            if(songArtists.size() == 1) {
+
+                // ! EXCEPTION HANDLING: EASY TO ASK FOR FORGIVENESS THAN PERMISSION (EAFTP) = use try-catch block
+                try {
+                    SongArtist songArtist = songArtists.get(0);
+
+                    deleteFromSongs.setInt(1, songArtist.getSong_id());
+                    int deletedRows = deleteFromSongs.executeUpdate();
+
+                    if(deletedRows == 1) {
+                        System.out.println(DELETED_SONG_ID + songArtist.getSong_id() + DELETED_FOR + songArtist.toString());
+                        return true;
+                    }
+
+                } catch(SQLException e) {
+                    System.out.println(DELETE_FAILED + e.getMessage());
+                    return false;
+                }
+            }
+            System.out.println(DELETE_FAILED_SIZE);
+            return false;
+
+        } catch(SQLException e) {
+            System.out.println(QUERY_FAILED + e.getMessage());
+        }
         return false;
     }
 }

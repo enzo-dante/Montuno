@@ -16,7 +16,7 @@ class DatasourceTest {
     private static final String BEFORE_ALL_TESTS = "Before all tests";
     private static final String AFTER_ALL_TESTS = "After all tests";
     private static final String TEST = "TEST";
-
+    private static final String TEST_DIVIDER = "----------------";
     private static final String TEST_ARTIST_IRON_MAIDEN = "Iron Maiden";
     private static final String TEST_ARTIST_GRATEFUL_DEAD = "Grateful Dead";
 
@@ -78,7 +78,7 @@ class DatasourceTest {
         List<Artist> artists = datasource.queryArtist(Datasource.ORDER_BY_NONE);
         assertNotNull(artists);
 
-        System.out.println("----------------");
+        System.out.println(TEST_DIVIDER);
 
         for (Artist artist : artists) {
             System.out.println(Datasource.ARTIST_NAME + artist.getName() + "\n" +
@@ -140,6 +140,7 @@ class DatasourceTest {
     void insertIntoSongs_success() {
         boolean actual = datasource.insertIntoSongs(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD, TEST_ALBUM_IN_THE_DARK, 1);
         assertTrue(actual);
+        datasource.deleteSong(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD);
     }
 
     @Test
@@ -160,8 +161,8 @@ class DatasourceTest {
     @Test
     void getCount_success() {
         int actualResult = datasource.getCount(Datasource.TABLE_SONGS);
-        int expectedResult = 5351;
-        assertEquals(expectedResult, actualResult, 10);
+        int expectedResult = 5350;
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
@@ -181,7 +182,7 @@ class DatasourceTest {
         List<SongArtist> songArtists = datasource.queryArtistForSong(TEST_SONG_HEARTLESS, 2);
         assertNotNull(songArtists);
 
-        System.out.println("----------------");
+        System.out.println(TEST_DIVIDER);
         Datasource.printSongArtists(songArtists);
     }
 
@@ -199,10 +200,10 @@ class DatasourceTest {
 
     @Test
     void queryArtistListView_success() {
-        List<SongArtist> actual = datasource.queryArtistListView(TEST_SONG_HEARTLESS);
+        List<SongArtist> actual = datasource.queryArtistListViewByTitle(TEST_SONG_HEARTLESS);
         assertNotNull(actual);
 
-        System.out.println("----------------");
+        System.out.println(TEST_DIVIDER);
         Datasource.printSongArtists(actual);
     }
 
@@ -210,7 +211,7 @@ class DatasourceTest {
     void queryArtistListView_fail() {
         datasource.close();
 
-        List<SongArtist> actual = datasource.queryArtistListView(TEST_SONG_HEARTLESS);
+        List<SongArtist> actual = datasource.queryArtistListViewByTitle(TEST_SONG_HEARTLESS);
         assertNull(actual);
     }
 
@@ -252,18 +253,15 @@ class DatasourceTest {
 
     @Test
     void deleteSong_true() {
-        fail(NOT_IMPLEMENTED_FAIL);
-//        insertIntoSongs_success();
-//        boolean actual = datasource.deleteSong(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD);
-//        assertTrue(actual);
+        datasource.insertIntoSongs(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD, TEST_ALBUM_IN_THE_DARK, 1);
+        boolean actual = datasource.deleteSong(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD);
+        assertTrue(actual);
     }
 
     @Test
-    void deleteSong_false() {
-        fail(NOT_IMPLEMENTED_FAIL);
-//        insertIntoSongs_success();
-//        boolean actual = datasource.deleteSong(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD);
-//        assertTrue(actual);
+    void deleteSong_missingFalse() {
+        boolean actual = datasource.deleteSong(TEST_SONG_TOUCH_GREY, TEST_ARTIST_GRATEFUL_DEAD);
+        assertFalse(actual);
     }
 
     @Test
