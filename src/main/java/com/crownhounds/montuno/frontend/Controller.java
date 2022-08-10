@@ -94,6 +94,74 @@ public class Controller {
     }
 
     /**
+     * This is the method which handles the event from the main.fxml file for listing all albums by artist name on the UI.
+     */
+    @FXML
+    public boolean listSongsForAlbum() {
+
+        // ! CASTING: converting one dataType to a compatible target dataType
+        final Artist artist = (Artist) artistsTable.getSelectionModel().getSelectedItem();
+
+        if(artist == null) {
+            System.out.println(NO_ARTIST_SELECTED);
+            return false;
+        }
+
+        // anonymous class
+        Task<ObservableList<Album>> task = new Task<>() {
+            @Override
+            protected ObservableList<Album> call() throws Exception {
+
+                Datasource datasource = Datasource.getDatasourceInstance();
+                List<Album> albums = datasource.queryAlbumsForArtistId(artist.get_id());
+
+                return FXCollections.observableArrayList(albums);
+            }
+        };
+
+        // update UI by populating it with db query data on new thread
+        artistsTable.itemsProperty().bind(task.valueProperty());
+
+        // use new Thread to start task and make SQL queries on db
+        new Thread(task).start();
+        return true;
+    }
+
+    /**
+     * This is the method which handles the event from the main.fxml file for listing all albums by artist name on the UI.
+     */
+    @FXML
+    public boolean deleteSongFromAlbum() {
+
+        // ! CASTING: converting one dataType to a compatible target dataType
+        final Artist artist = (Artist) artistsTable.getSelectionModel().getSelectedItem();
+
+        if(artist == null) {
+            System.out.println(NO_ARTIST_SELECTED);
+            return false;
+        }
+
+        // anonymous class
+        Task<ObservableList<Album>> task = new Task<>() {
+            @Override
+            protected ObservableList<Album> call() throws Exception {
+
+                Datasource datasource = Datasource.getDatasourceInstance();
+                List<Album> albums = datasource.queryAlbumsForArtistId(artist.get_id());
+
+                return FXCollections.observableArrayList(albums);
+            }
+        };
+
+        // update UI by populating it with db query data on new thread
+        artistsTable.itemsProperty().bind(task.valueProperty());
+
+        // use new Thread to start task and make SQL queries on db
+        new Thread(task).start();
+        return true;
+    }
+
+    /**
      * This is the method which handles the event from the main.fxml file for updating an artist name on the backend and for the UI.
      */
     @FXML

@@ -31,6 +31,8 @@
             <children>
                 <Button onAction="#listArtists" maxWidth="Infinity" mnemonicParsing="false" text="List Artists" />
                 <Button onAction="#listAlbumsForArtist" maxWidth="Infinity" mnemonicParsing="false" text="Show Albums (artist)" />
+                <Button onAction="#listSongsForAlbum" maxWidth="Infinity" mnemonicParsing="false" text="Show Songs (album)" />
+                <Button onAction="#deleteSongFromAlbum" maxWidth="Infinity" mnemonicParsing="false" text="Delete Song (album)" />
                 <Button onAction="#updateArtistName" maxWidth="Infinity" mnemonicParsing="false" text="Update Artist" />
             </children>
             <BorderPane.margin>
