@@ -45,19 +45,21 @@ public class Datasource {
     private static final int INDEX_ALBUM_ID = 1;
     private static final int INDEX_ALBUM_NAME = 2;
 
-    // SongArtist member fields
-    public static final String ARTIST_NAME = "Artist Name: ";
-    public static final String ARTIST_ID = "Artist ID: ";
-    public static final String ALBUM_NAME = "Album Name: ";
-    public static final String TRACK_NUMBER = "Track: ";
-    public static final String SONG_TITLE = "Song Title: ";
-    public static final String SONG_ID = "Song ID: ";
+    // artist_list VIEW/SongArtist member fields
+    public static final String TABLE_ARTIST_LIST_VIEW = "artist_list";
+    public static final String DROP_VIEW = "DROP VIEW ";
     private static final String COLUMN_ARTIST_LIST_SONG_ID = "song_id";
     private static final int INDEX_ARTIST_LIST_SONG_ID = 5;
     private static final int INDEX_ARTIST_LIST_SONG_TITLE = 4;
     private static final int INDEX_ARTIST_LIST_SONG_TRACK = 3;
     private static final int INDEX_ARTIST_LIST_ALBUM_NAME = 2;
     private static final int INDEX_ARTIST_LIST_ARTIST_NAME = 1;
+    public static final String ARTIST_NAME = "Artist Name: ";
+    public static final String ARTIST_ID = "Artist ID: ";
+    public static final String ALBUM_NAME = "Album Name: ";
+    public static final String TRACK_NUMBER = "Track: ";
+    public static final String SONG_TITLE = "Song Title: ";
+    public static final String SONG_ID = "Song ID: ";
 
     public static final String TABLE_ARTISTS = "artists";
     public static final String COLUMN_ARTISTS_ID = "_id";
@@ -103,7 +105,6 @@ public class Datasource {
     private static final String PLACEHOLDER_DOUBLE_VALUE_CLOSE = ") VALUES(?, ?)";
     private static final String PLACEHOLDER_TRIPLE_VALUE_CLOSE = ") VALUES(?, ?, ?)";
 
-    public static final String TABLE_ARTIST_LIST_VIEW = "artist_list";
     public static final String CREATE_VIEW_IF_NOT_EXISTS = "CREATE VIEW IF NOT EXISTS ";
     private static final String VIEW_AS_SELECT = " AS SELECT ";
 
@@ -165,6 +166,9 @@ public class Datasource {
             SELECT_ALL + TABLE_ARTIST_LIST_VIEW +
                     WHERE + COLUMN_SONGS_TITLE + EQUALS + PLACEHOLDER_QUESTION_MARK + COLLATE_NO_CASE;
 
+    public static final String DROP_ARTIST_LIST_VIEW =
+            DROP_VIEW + TABLE_ARTIST_LIST_VIEW;
+
     public static final String INSERT_INTO_ARTISTS =
             INSERT_INTO + TABLE_ARTISTS +
                     PLACEHOLDER_VALUES_OPEN + COLUMN_ARTISTS_NAME + PLACEHOLDER_SINGLE_VALUE_CLOSE;
@@ -215,6 +219,7 @@ public class Datasource {
      */
     private PreparedStatement queryArtistListView;
     private PreparedStatement queryArtistListViewByTitle;
+    private PreparedStatement dropArtistListView;
     private PreparedStatement queryArtists;
     private PreparedStatement queryAlbums;
     private PreparedStatement querySongs;
@@ -257,6 +262,7 @@ public class Datasource {
              */
             queryArtistListView = connection.prepareStatement(QUERY_ARTIST_LIST_VIEW);
             queryArtistListViewByTitle = connection.prepareStatement(QUERY_ARTIST_LIST_VIEW_BY_TITLE);
+            dropArtistListView = connection.prepareStatement(DROP_ARTIST_LIST_VIEW);
 
             queryArtists = connection.prepareStatement(QUERY_ARTISTS);
             queryAlbums = connection.prepareStatement(QUERY_ALBUMS);
@@ -303,6 +309,10 @@ public class Datasource {
 
             if (deleteFromSongs != null) {
                 deleteFromSongs.close();
+            }
+
+            if (dropArtistListView != null) {
+                dropArtistListView.close();
             }
 
             if (queryArtistListView != null) {
@@ -504,23 +514,7 @@ public class Datasource {
              // ? JAVA_FX: executeQuery with built SQL toString
              ResultSet resultSet = statement.executeQuery(sb.toString())) {
 
-            // ! INTERFACE: an abstract collection of public signatures that designated classes MUST uniquely implement/@Override for standardization
-            // ! GENERICS: improve OOP ENCAPSULATION by creating classes, interfaces, & methods that only take a specific dataType parameter
-            List<SongArtist> songArtists = new ArrayList<>();
-
-            while (resultSet.next()) {
-
-                SongArtist songArtist = new SongArtist();
-
-                songArtist.setArtistName(resultSet.getString(INDEX_ARTIST_LIST_ARTIST_NAME));
-                songArtist.setAlbumName(resultSet.getString(INDEX_ARTIST_LIST_ALBUM_NAME));
-                songArtist.setTrack(resultSet.getInt(INDEX_ARTIST_LIST_SONG_TRACK));
-                songArtist.setSongTitle(resultSet.getString(INDEX_ARTIST_LIST_SONG_TITLE));
-                songArtist.setSong_id(resultSet.getInt(INDEX_ARTIST_LIST_SONG_ID));
-
-                songArtists.add(songArtist);
-            }
-            return songArtists;
+            return buildSongArtists(resultSet);
 
         } catch (SQLException e) {
             System.out.println(QUERY_FAILED + e.getMessage());
@@ -543,28 +537,40 @@ public class Datasource {
             queryArtistListView.setString(1, title);
             ResultSet resultSet = queryArtistListView.executeQuery();
 
-            // ! INTERFACE: an abstract collection of public signatures that designated classes MUST uniquely implement/@Override for standardization
-            // ! GENERICS: improve OOP ENCAPSULATION by creating classes, interfaces, & methods that only take a specific dataType parameter
-            List<SongArtist> songArtists = new ArrayList<>();
-
-            while (resultSet.next()) {
-
-                SongArtist songArtist = new SongArtist();
-
-                songArtist.setArtistName(resultSet.getString(INDEX_ARTIST_LIST_ARTIST_NAME));
-                songArtist.setAlbumName(resultSet.getString(INDEX_ARTIST_LIST_ALBUM_NAME));
-                songArtist.setTrack(resultSet.getInt(INDEX_ARTIST_LIST_SONG_TRACK));
-                songArtist.setSongTitle(resultSet.getString(INDEX_ARTIST_LIST_SONG_TITLE));
-                songArtist.setSong_id(resultSet.getInt(INDEX_ARTIST_LIST_SONG_ID));
-
-                songArtists.add(songArtist);
-            }
-            return songArtists;
+            return buildSongArtists(resultSet);
 
         } catch (SQLException e) {
             System.out.println(QUERY_FAILED + e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * ! OVERLOADED METHOD: same name method w/ unique parameters that optimize readability & scalability
+     * get list of songArtist
+     *
+     * @param resultSet SQL query results
+     * @return list of songArtists
+     */
+    private List<SongArtist> buildSongArtists(ResultSet resultSet) throws SQLException {
+
+        // ! INTERFACE: an abstract collection of public signatures that designated classes MUST uniquely implement/@Override for standardization
+        // ! GENERICS: improve OOP ENCAPSULATION by creating classes, interfaces, & methods that only take a specific dataType parameter
+        List<SongArtist> songArtists = new ArrayList<>();
+
+        while (resultSet.next()) {
+
+            SongArtist songArtist = new SongArtist();
+
+            songArtist.setArtistName(resultSet.getString(INDEX_ARTIST_LIST_ARTIST_NAME));
+            songArtist.setAlbumName(resultSet.getString(INDEX_ARTIST_LIST_ALBUM_NAME));
+            songArtist.setTrack(resultSet.getInt(INDEX_ARTIST_LIST_SONG_TRACK));
+            songArtist.setSongTitle(resultSet.getString(INDEX_ARTIST_LIST_SONG_TITLE));
+            songArtist.setSong_id(resultSet.getInt(INDEX_ARTIST_LIST_SONG_ID));
+
+            songArtists.add(songArtist);
+        }
+        return songArtists;
     }
 
     /**
@@ -976,19 +982,7 @@ public class Datasource {
             ResultSet resultSet = queryArtistListView.executeQuery();
 
             // ! GENERICS: improve ENCAPSULATION by enforcing element dataType
-            ArrayList<SongArtist> songArtists = new ArrayList<>();
-
-            while(resultSet.next()) {
-                SongArtist songArtist = new SongArtist();
-
-                songArtist.setArtistName(resultSet.getString(INDEX_ARTIST_LIST_ARTIST_NAME));
-                songArtist.setAlbumName(resultSet.getString(INDEX_ARTIST_LIST_ALBUM_NAME));
-                songArtist.setTrack(resultSet.getInt(INDEX_ARTIST_LIST_SONG_TRACK));
-                songArtist.setSongTitle(resultSet.getString(INDEX_ARTIST_LIST_SONG_TITLE));
-                songArtist.setSong_id(resultSet.getInt(INDEX_ARTIST_LIST_SONG_ID));
-
-                songArtists.add(songArtist);
-            }
+            List<SongArtist> songArtists = buildSongArtists(resultSet);
 
             // ! EXCEPTION HANDLING: LOOK BEFORE YOU LEAP (LBYL) = use conditional if-else block
             if(songArtists.size() == 1) {
@@ -1016,6 +1010,15 @@ public class Datasource {
         } catch(SQLException e) {
             System.out.println(QUERY_FAILED + e.getMessage());
         }
+        return false;
+    }
+
+    /**
+     * drop view artist_list from database
+     * @return SQL query success state
+     */
+    public static final boolean dropArtistListView() {
+
         return false;
     }
 }

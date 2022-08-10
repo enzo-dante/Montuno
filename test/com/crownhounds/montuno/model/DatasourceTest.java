@@ -272,4 +272,14 @@ class DatasourceTest {
         boolean actual = datasource.deleteSong(testSong, testArtist);
         assertFalse(actual);
     }
+
+    @Test
+    void dropArtistListView_success() {
+        fail(NOT_IMPLEMENTED_FAIL);
+    }
+
+    @Test
+    void dropArtistListView_fail() {
+        fail(NOT_IMPLEMENTED_FAIL);
+    }
 }
