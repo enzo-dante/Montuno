@@ -15,8 +15,10 @@ public class Datasource {
     private static final String DELETED_FOR = " for:\n\t";
     private static final String CREATE_VIEW_FAILED = "Create View failed: ";
     private static final String CREATED_VIEW_ARTIST_LIST = "CREATED VIEW: artist_list\n";
+    private static final String DROPPED_VIEW_ARTIST_LIST = "DROPPED VIEW: artist_list\n";
     private static final String QUERY_ARTIST_LIST_VIEW_FAILED = "queryArtistListView failed: ";
     private static final String QUERY_ARTIST_FOR_SONG_SQL = "queryArtistForSong SQL:\n";
+    private static final String QUERY_SONGS_METADATA = "\nQuerySongsMetadata():";
     private static final String INSERT_ARTIST_FAIL = "Couldn't insert artist!";
     private static final String GET_ARTIST_FAIL = "Couldn't get _id for artist!";
     private static final String INSERT_ALBUM_FAIL = "Couldn't insert album!";
@@ -47,7 +49,6 @@ public class Datasource {
 
     // artist_list VIEW/SongArtist member fields
     public static final String TABLE_ARTIST_LIST_VIEW = "artist_list";
-    public static final String DROP_VIEW = "DROP VIEW ";
     private static final String COLUMN_ARTIST_LIST_SONG_ID = "song_id";
     private static final int INDEX_ARTIST_LIST_SONG_ID = 5;
     private static final int INDEX_ARTIST_LIST_SONG_TITLE = 4;
@@ -98,6 +99,8 @@ public class Datasource {
     private static final String AND = " AND ";
     private static final String INSERT_INTO = "INSERT INTO ";
     private static final String DELETE_FROM = "DELETE FROM ";
+    public static final String IF_NOT_EXISTS = " IF NOT EXISTS ";
+    public static final String IF_EXISTS = " IF EXISTS ";
 
     private static final String PLACEHOLDER_QUESTION_MARK = " ?";
     private static final String PLACEHOLDER_VALUES_OPEN = "(";
@@ -105,7 +108,9 @@ public class Datasource {
     private static final String PLACEHOLDER_DOUBLE_VALUE_CLOSE = ") VALUES(?, ?)";
     private static final String PLACEHOLDER_TRIPLE_VALUE_CLOSE = ") VALUES(?, ?, ?)";
 
-    public static final String CREATE_VIEW_IF_NOT_EXISTS = "CREATE VIEW IF NOT EXISTS ";
+    public static final String CREATE_VIEW_IF_NOT_EXISTS = "CREATE VIEW" + IF_NOT_EXISTS;
+    public static final String DROP_VIEW = "DROP VIEW" + IF_EXISTS;
+
     private static final String VIEW_AS_SELECT = " AS SELECT ";
 
     public static final int ORDER_BY_NONE = 1;
@@ -219,7 +224,6 @@ public class Datasource {
      */
     private PreparedStatement queryArtistListView;
     private PreparedStatement queryArtistListViewByTitle;
-    private PreparedStatement dropArtistListView;
     private PreparedStatement queryArtists;
     private PreparedStatement queryAlbums;
     private PreparedStatement querySongs;
@@ -262,7 +266,6 @@ public class Datasource {
              */
             queryArtistListView = connection.prepareStatement(QUERY_ARTIST_LIST_VIEW);
             queryArtistListViewByTitle = connection.prepareStatement(QUERY_ARTIST_LIST_VIEW_BY_TITLE);
-            dropArtistListView = connection.prepareStatement(DROP_ARTIST_LIST_VIEW);
 
             queryArtists = connection.prepareStatement(QUERY_ARTISTS);
             queryAlbums = connection.prepareStatement(QUERY_ALBUMS);
@@ -309,10 +312,6 @@ public class Datasource {
 
             if (deleteFromSongs != null) {
                 deleteFromSongs.close();
-            }
-
-            if (dropArtistListView != null) {
-                dropArtistListView.close();
             }
 
             if (queryArtistListView != null) {
@@ -697,16 +696,19 @@ public class Datasource {
      * @param sortOrder
      * @return
      */
-    public List<SongArtist> queryArtistForSong(String songName, int sortOrder) {
-        StringBuilder sb = new StringBuilder(QUERY_ARTISTS_FOR_SONGS_START);
-        sb.append(formatField(songName));
+    public List<SongArtist> queryArtistsForSong(String songName, int sortOrder) {
 
-        System.out.println(QUERY_ARTIST_FOR_SONG_SQL + sb.toString());
+        if(sortOrder == ORDER_BY_NONE || sortOrder == ORDER_BY_ASC || sortOrder == ORDER_BY_DESC) {
+            StringBuilder sb = new StringBuilder(QUERY_ARTISTS_FOR_SONGS_START);
+            sb.append(formatField(songName));
 
-        List<SongArtist> results = buildSongArtists(sb);
+            System.out.println(QUERY_ARTIST_FOR_SONG_SQL + sb.toString());
 
-        if (results != null && !results.isEmpty()) {
-            return results;
+            List<SongArtist> results = buildSongArtists(sb);
+
+            if (results != null && !results.isEmpty()) {
+                return results;
+            }
         }
         return null;
     }
@@ -724,6 +726,8 @@ public class Datasource {
 
             ResultSetMetaData metadata = resultSet.getMetaData();
             int numColumns = metadata.getColumnCount();
+
+            System.out.println(QUERY_SONGS_METADATA);
 
             for (int i = SQL_START_INDEX; i <= numColumns; i++) {
                 System.out.format(
@@ -757,6 +761,27 @@ public class Datasource {
 
         } catch (SQLException e) {
             System.out.println(CREATE_VIEW_FAILED + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * drop view artist_list from database
+     * @return SQL query success state
+     */
+    public static boolean dropArtistListView() {
+
+        try (Statement statement = DriverManager.getConnection(CONNECTION_STRING).createStatement()) {
+
+            // use .execute(sql.toString()) instead of .executeQuery(sql.toString()) given no return values
+            statement.execute(DROP_ARTIST_LIST_VIEW);
+            statement.close();
+
+            System.out.println(DROPPED_VIEW_ARTIST_LIST);
+            return true;
+
+        } catch (SQLException e) {
+            System.out.println(DELETE_FAILED + e.getMessage());
             return false;
         }
     }
@@ -1010,15 +1035,6 @@ public class Datasource {
         } catch(SQLException e) {
             System.out.println(QUERY_FAILED + e.getMessage());
         }
-        return false;
-    }
-
-    /**
-     * drop view artist_list from database
-     * @return SQL query success state
-     */
-    public static final boolean dropArtistListView() {
-
         return false;
     }
 }

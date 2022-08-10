@@ -3,23 +3,19 @@
 ![appRunAfter](resources/Montuno_appRunAfter.gif)
 
 ### frontend
-1. wrote controller that uses FXML to interface with JavaFX via main.fxml file
-2. manage SQLite3 database via SQL
-3. current UI functionality: GET, UPDATE 
+1. added createArtistListView() call in main() of Main.java
 
 ### backend
-1. added logic & tests to backend deleteSong() 
-2. saved all String instances in Datasource to a respective CONSTANT
-3. saved artist_list column indices as CONSTANTS
-4. created & separated logic & tests for SQL statements: QUERY_ARTIST_LIST_VIEW and QUERY_ARTIST_LIST_VIEW_BY_TITLE
-5. added deleteSong() to insertIntoSongs_success test to preserve music.db file
-6. updated getCount_success test to account for deleteSong() after insertIntoSongs_success test
+1. added logic & test to backend for dropArtistListView()
+2. added dropArtistListView() test in beforeAll to allow for app to run
+3. added test for badInput sortOrder for queryArtistsForSong()
 
 # Functional Impacts:
-1. can deleteSong() by SongArtist song_id from database after validating data first from artist_list view
+1. automated creation of artist_list view by createArtistListView() before app launch()
+2. artist_list view dropped automatically before all tests are run to preserve original db integrity before testing
 
 # QA Reminders:
-1. run DatasourceTest.java before starting application to create artist_list view
+1. run Main.main() to launch application
 2. use DB Browser for SQLite app for database viewing
 3. there is a music_original.db backup file in resources dir if music.db is corrupted via testing 
 

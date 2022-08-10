@@ -24,6 +24,7 @@ class DatasourceTest {
     private static final String TEST_SONG_TOUCH_GREY = "Touch of Grey";
 
     private static final String TEST_ALBUM_IN_THE_DARK = "In The Dark";
+    private static final int SORT_ORDER_NULL = 5;
 
     // OOP ENCAPSULATION private class fields
     Datasource datasource;
@@ -33,12 +34,14 @@ class DatasourceTest {
     @BeforeAll
     static void beforeAll() {
         System.out.println(BEFORE_ALL_TESTS);
+        assertTrue(Datasource.dropArtistListView());
         assertTrue(Datasource.createArtistListViewForSongArtists());
     }
 
     @AfterAll
     static void afterAll() {
         System.out.println(AFTER_ALL_TESTS);
+        assertTrue(Datasource.dropArtistListView());
     }
 
     @BeforeEach
@@ -80,10 +83,7 @@ class DatasourceTest {
 
         System.out.println(TEST_DIVIDER);
 
-        for (Artist artist : artists) {
-            System.out.println(Datasource.ARTIST_NAME + artist.getName() + "\n" +
-                    Datasource.ARTIST_ID + artist.get_id() + "\n");
-        }
+        Datasource.printArtists(artists);
     }
 
     @Test
@@ -104,7 +104,7 @@ class DatasourceTest {
 
     @Test
     void queryArtist_null() {
-        List<Artist> artists = datasource.queryArtist(5);
+        List<Artist> artists = datasource.queryArtist(SORT_ORDER_NULL);
         assertNull(artists);
     }
 
@@ -118,7 +118,7 @@ class DatasourceTest {
     void handleSort_null() {
         StringBuilder sb = new StringBuilder(Datasource.QUERY_ALBUMS_BY_ARTIST_START);
         sb.append(datasource.formatField(TEST_ARTIST_IRON_MAIDEN));
-        sb = Datasource.handleSort(sb, 5, Datasource.QUERY_ALBUMS_BY_ARTIST_SORT);
+        sb = Datasource.handleSort(sb, SORT_ORDER_NULL, Datasource.QUERY_ALBUMS_BY_ARTIST_SORT);
         assertNull(sb);
     }
 
@@ -179,7 +179,7 @@ class DatasourceTest {
 
     @Test
     void queryArtistsForSong_success() {
-        List<SongArtist> songArtists = datasource.queryArtistForSong(TEST_SONG_HEARTLESS, 2);
+        List<SongArtist> songArtists = datasource.queryArtistsForSong(TEST_SONG_HEARTLESS, Datasource.ORDER_BY_DESC);
         assertNotNull(songArtists);
 
         System.out.println(TEST_DIVIDER);
@@ -187,8 +187,14 @@ class DatasourceTest {
     }
 
     @Test
-    void queryArtistsForSong_null() {
-        List<SongArtist> songArtists = datasource.queryArtistForSong(TEST, 3);
+    void queryArtistsForSong_badInputSong() {
+        List<SongArtist> songArtists = datasource.queryArtistsForSong(TEST, Datasource.ORDER_BY_DESC);
+        assertNull(songArtists);
+    }
+
+    @Test
+    void queryArtistsForSong_badInputSortOrder() {
+        List<SongArtist> songArtists = datasource.queryArtistsForSong(TEST_SONG_HEARTLESS, SORT_ORDER_NULL);
         assertNull(songArtists);
     }
 
@@ -271,15 +277,5 @@ class DatasourceTest {
 
         boolean actual = datasource.deleteSong(testSong, testArtist);
         assertFalse(actual);
-    }
-
-    @Test
-    void dropArtistListView_success() {
-        fail(NOT_IMPLEMENTED_FAIL);
-    }
-
-    @Test
-    void dropArtistListView_fail() {
-        fail(NOT_IMPLEMENTED_FAIL);
     }
 }
