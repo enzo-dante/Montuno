@@ -30,10 +30,10 @@
         <VBox alignment="CENTER" prefHeight="200.0" prefWidth="170.00" spacing="20.0" BorderPane.alignment="CENTER">
             <children>
                 <Button onAction="#listArtists" maxWidth="Infinity" mnemonicParsing="false" text="List Artists" />
-                <Button onAction="#listAlbumsForArtist" maxWidth="Infinity" mnemonicParsing="false" text="Show Albums (artist)" />
-                <Button onAction="#listSongsForAlbum" maxWidth="Infinity" mnemonicParsing="false" text="Show Songs (album)" />
-                <Button onAction="#deleteSongFromAlbum" maxWidth="Infinity" mnemonicParsing="false" text="Delete Song (album)" />
-                <Button onAction="#updateArtistName" maxWidth="Infinity" mnemonicParsing="false" text="Update Artist" />
+                <Button onAction="#listAlbumsForArtist" maxWidth="Infinity" mnemonicParsing="false" text="Show Artist Albums" />
+                <Button onAction="#updateArtistName" maxWidth="Infinity" mnemonicParsing="false" text="Update Artist Name" />
+                <Button fx:id="listSongsForAlbum" visible="false" onAction="#listSongsForAlbum" maxWidth="Infinity" mnemonicParsing="false" text="Show Album Songs" />
+                <Button fx:id="deleteSongBtn" visible="false" onAction="#deleteSongFromAlbum" maxWidth="Infinity" mnemonicParsing="false" text="Delete Song" />
             </children>
             <BorderPane.margin>
                 <Insets right="10.0" />

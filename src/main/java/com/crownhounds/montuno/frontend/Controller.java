@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableView;
 
@@ -19,7 +20,7 @@ import java.util.List;
 public class Controller {
 
     // CONSTANTS/static class variables assigned FINAL value before compilation/instantiation
-    private static final String UPDATED_ARTIST_NAME = "AC/DC (updated name)";
+    private static final String UPDATED_AC_DC_NAME = "AC/DC (updated name)";
     private static final String NO_ARTIST_SELECTED = "No artist selected";
 
     /*
@@ -33,6 +34,10 @@ public class Controller {
 
     @FXML
     private ProgressBar progressBar;
+    @FXML
+    private Button deleteSongBtn;
+    @FXML
+    private Button listSongsForAlbum;
 
     private void handleProgressBarUpdate(Task task) {
         // using lambda expressions to manage visibility of progress bar regardless of success or failure
@@ -40,8 +45,17 @@ public class Controller {
 
         progressBar.setVisible(true);
 
+        handleDeleteSongBtn(task);
         task.setOnSucceeded(event -> progressBar.setVisible(false));
         task.setOnFailed(event -> progressBar.setVisible(false));
+    }
+
+    private void handleDeleteSongBtn(Task task) {
+
+    }
+
+    private void handleListSongsForAlbum(Task task) {
+
     }
 
     /**
@@ -99,31 +113,6 @@ public class Controller {
     @FXML
     public boolean listSongsForAlbum() {
 
-        // ! CASTING: converting one dataType to a compatible target dataType
-        final Artist artist = (Artist) artistsTable.getSelectionModel().getSelectedItem();
-
-        if(artist == null) {
-            System.out.println(NO_ARTIST_SELECTED);
-            return false;
-        }
-
-        // anonymous class
-        Task<ObservableList<Album>> task = new Task<>() {
-            @Override
-            protected ObservableList<Album> call() throws Exception {
-
-                Datasource datasource = Datasource.getDatasourceInstance();
-                List<Album> albums = datasource.queryAlbumsForArtistId(artist.get_id());
-
-                return FXCollections.observableArrayList(albums);
-            }
-        };
-
-        // update UI by populating it with db query data on new thread
-        artistsTable.itemsProperty().bind(task.valueProperty());
-
-        // use new Thread to start task and make SQL queries on db
-        new Thread(task).start();
         return true;
     }
 
@@ -133,31 +122,6 @@ public class Controller {
     @FXML
     public boolean deleteSongFromAlbum() {
 
-        // ! CASTING: converting one dataType to a compatible target dataType
-        final Artist artist = (Artist) artistsTable.getSelectionModel().getSelectedItem();
-
-        if(artist == null) {
-            System.out.println(NO_ARTIST_SELECTED);
-            return false;
-        }
-
-        // anonymous class
-        Task<ObservableList<Album>> task = new Task<>() {
-            @Override
-            protected ObservableList<Album> call() throws Exception {
-
-                Datasource datasource = Datasource.getDatasourceInstance();
-                List<Album> albums = datasource.queryAlbumsForArtistId(artist.get_id());
-
-                return FXCollections.observableArrayList(albums);
-            }
-        };
-
-        // update UI by populating it with db query data on new thread
-        artistsTable.itemsProperty().bind(task.valueProperty());
-
-        // use new Thread to start task and make SQL queries on db
-        new Thread(task).start();
         return true;
     }
 
@@ -173,14 +137,15 @@ public class Controller {
             @Override
             protected Boolean call() throws Exception {
                 Datasource datasource = Datasource.getDatasourceInstance();
-                return datasource.updateArtistName(artist.get_id(), Datasource.UPDATE_ARTIST_NAME);
+                return datasource.updateArtistName(artist.get_id(), UPDATED_AC_DC_NAME);
             }
         };
 
-        // if task succeeds, then update UI to match updated record in the db on it's own thread
+        // if task succeeds, then update UI to match updated record in the db on its own thread
         task.setOnSucceeded(event -> {
             if(task.valueProperty().get()) {
-                artist.setName(UPDATED_ARTIST_NAME);
+                artist.setName(UPDATED_AC_DC_NAME);
+
                 // refresh() forces table to re-draw UI rows for proper table alignment with new db data
                 artistsTable.refresh();
             }
