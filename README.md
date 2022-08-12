@@ -3,7 +3,7 @@
 ![appRunAfter](resources/Montuno_appRunAfter.gif)
 
 ### frontend
-1. completed logic for listSongsForAlbum() that connects to backend
+1. completed logic for listSongsForAlbum() that connects to backend to fetch data and renders it to the UI
 2. added Show Song button that toggles if on album list view
 
 FUTURE STORY FIX: had to manually create an Album for UI because return src model is automatically Artist object and when cast as model is mapped incorrectly to a compatible target dataType
