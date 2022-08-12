@@ -79,7 +79,7 @@ public class Datasource {
 
     // SQL statement query composition
     private static final String ORDER_BY = " ORDER BY ";
-    private static final String SELECT_ALL = "SELECT * FROM ";
+    private static final String SELECT_ALL_FROM = "SELECT * FROM ";
     private static final String SELECT_COUNT_ALL = "SELECT COUNT(*) AS count, MIN(_id) AS min FROM ";
     private static final String COLLATE_NO_CASE = " COLLATE NOCASE ";
     private static final String ASC = " ASC ";
@@ -163,12 +163,12 @@ public class Datasource {
     // ? = placeholder for title
     // SQL statement: SELECT name, album, track FROM artist_list WHERE title = ?
     public static final String QUERY_ARTIST_LIST_VIEW =
-            SELECT_ALL + TABLE_ARTIST_LIST_VIEW +
+            SELECT_ALL_FROM + TABLE_ARTIST_LIST_VIEW +
                     WHERE + COLUMN_SONGS_TITLE + EQUALS + PLACEHOLDER_QUESTION_MARK + COLLATE_NO_CASE +
                     AND + COLUMN_ARTISTS_NAME + EQUALS + PLACEHOLDER_QUESTION_MARK + COLLATE_NO_CASE;
 
     public static final String QUERY_ARTIST_LIST_VIEW_BY_TITLE =
-            SELECT_ALL + TABLE_ARTIST_LIST_VIEW +
+            SELECT_ALL_FROM + TABLE_ARTIST_LIST_VIEW +
                     WHERE + COLUMN_SONGS_TITLE + EQUALS + PLACEHOLDER_QUESTION_MARK + COLLATE_NO_CASE;
 
     public static final String DROP_ARTIST_LIST_VIEW =
@@ -202,8 +202,12 @@ public class Datasource {
                     WHERE + COLUMN_SONGS_TITLE + EQUALS + PLACEHOLDER_QUESTION_MARK;
 
     public static final String QUERY_ALBUMS_BY_ARTIST_ID =
-            SELECT_ALL + TABLE_ALBUMS +
+            SELECT_ALL_FROM + TABLE_ALBUMS +
                     WHERE + COLUMN_ALBUMS_ARTIST + EQUALS + PLACEHOLDER_QUESTION_MARK + ORDER_BY + COLUMN_ALBUMS_NAME + COLLATE_NO_CASE;
+
+    public static final String QUERY_SONGS_BY_ALBUM_ID =
+            SELECT_ALL_FROM + TABLE_SONGS +
+                    WHERE + COLUMN_SONGS_ALBUM + EQUALS + PLACEHOLDER_QUESTION_MARK + ORDER_BY + COLUMN_SONGS_TRACK + COLLATE_NO_CASE;
 
     public static final String UPDATE_ARTIST_NAME =
             UPDATE + TABLE_ARTISTS +
@@ -228,6 +232,7 @@ public class Datasource {
     private PreparedStatement queryAlbums;
     private PreparedStatement querySongs;
     private PreparedStatement queryAlbumsByArtistId;
+    private PreparedStatement querySongsByAlbumId;
 
     private PreparedStatement insertIntoArtists;
     private PreparedStatement insertIntoAlbums;
@@ -271,6 +276,7 @@ public class Datasource {
             queryAlbums = connection.prepareStatement(QUERY_ALBUMS);
             querySongs = connection.prepareStatement(QUERY_SONGS);
             queryAlbumsByArtistId = connection.prepareStatement(QUERY_ALBUMS_BY_ARTIST_ID);
+            querySongsByAlbumId = connection.prepareStatement(QUERY_SONGS_BY_ALBUM_ID);
 
             // ? JDBC: Statement.RETURN_GENERATED_KEYS = need ids to pass into subsequent insert statement until committing to songs table
             insertIntoArtists = connection.prepareStatement(INSERT_INTO_ARTISTS, Statement.RETURN_GENERATED_KEYS);
@@ -332,6 +338,10 @@ public class Datasource {
 
             if (queryAlbumsByArtistId != null) {
                 queryAlbumsByArtistId.close();
+            }
+
+            if (querySongsByAlbumId != null) {
+                querySongsByAlbumId.close();
             }
 
             if (querySongs != null) {
@@ -590,7 +600,7 @@ public class Datasource {
      */
     public List<Artist> queryArtist(int sortOrder) {
 
-        StringBuilder stringBuilder = new StringBuilder(SELECT_ALL);
+        StringBuilder stringBuilder = new StringBuilder(SELECT_ALL_FROM);
         stringBuilder.append(TABLE_ARTISTS);
 
         stringBuilder = handleSort(stringBuilder, sortOrder);
@@ -719,7 +729,7 @@ public class Datasource {
      * @return if SQL SELECT query was successful
      */
     public boolean querySongsMetadata() {
-        String sql = SELECT_ALL + TABLE_SONGS;
+        String sql = SELECT_ALL_FROM + TABLE_SONGS;
 
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
@@ -804,6 +814,42 @@ public class Datasource {
         return null;
     }
 
+    public List<Song> querySongsByAlbumId(int albumId) {
+
+        if(albumId < 0) {
+            return null;
+        }
+
+        try {
+
+            List<Song> songs = new ArrayList<>();
+
+            querySongsByAlbumId.setInt(1, albumId);
+            ResultSet resultSet = querySongsByAlbumId.executeQuery();
+
+            while(resultSet.next()) {
+
+                Song song = new Song();
+
+                song.set_id(resultSet.getInt(1));
+                song.setTrack(resultSet.getInt(2));
+                song.setName(resultSet.getString(3));
+                song.setAlbumId(resultSet.getInt(4));
+
+                songs.add(song);
+            }
+
+            if(songs.isEmpty()) {
+                return null;
+            }
+
+            return songs;
+
+        } catch (SQLException e) {
+            System.out.println(QUERY_FAILED + e.getMessage());
+            return null;
+        }
+    }
     /**
      * ? THROW EXCEPTION: initiate specific exception with provided error msg
      * <p>

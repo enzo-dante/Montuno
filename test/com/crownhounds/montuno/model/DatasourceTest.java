@@ -2,6 +2,7 @@ package com.crownhounds.montuno.model;
 
 import com.crownhounds.montuno.backend.model.Artist;
 import com.crownhounds.montuno.backend.model.Datasource;
+import com.crownhounds.montuno.backend.model.Song;
 import com.crownhounds.montuno.backend.model.SongArtist;
 import org.junit.jupiter.api.*;
 
@@ -278,4 +279,19 @@ class DatasourceTest {
         boolean actual = datasource.deleteSong(testSong, testArtist);
         assertFalse(actual);
     }
+
+    @Test
+    void querySongsByAlbumId_success() {
+        int testInput = 1;
+        List<Song> actual = datasource.querySongsByAlbumId(testInput);
+        assertNotNull(actual);
+    }
+
+    @Test
+    void querySongsByAlbumId_badInput() {
+        int testInput = -1;
+        List<Song> actual = datasource.querySongsByAlbumId(testInput);
+        assertNull(actual);
+    }
+
 }

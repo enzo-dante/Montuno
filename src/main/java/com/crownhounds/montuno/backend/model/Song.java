@@ -5,16 +5,16 @@ public class Song {
     // OOP ENCAPSULATION private class fields
     private int _id;
     private int track;
-    private String title;
+    private String name;
     private int albumId;
 
     // OOP getters & setters
-    public String getTitle() {
-        return this.title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int get_id() {
