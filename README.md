@@ -3,14 +3,18 @@
 ![appRunAfter](resources/Montuno_appRunAfter.gif)
 
 ### frontend
-1. in controller on the frontend, changed CONSTANT name from UPDATED_ARTIST_NAME to UPDATED_AC_DC_NAME to avoid incorrect references
-2. added FXML tags & method signatures for deleteSongBtn and listSongsForAlbum
+1. completed logic for listSongsForAlbum() that connects to backend
+2. added Show Song button that toggles if on album list view
+
+FUTURE STORY FIX: had to manually create an Album for UI because return src model is automatically Artist object and when cast as model is mapped incorrectly to a compatible target dataType
 
 ### backend
-1. n/a 
+1. added SQL constants, tests, and querySongsById method to Datasource
+2. updated Song field "title" to "name"
+3. updated constants that pertain to Song class using "title" to "name"
 
 # Functional Impacts:
-1. UI update button change to "AC DC" will preserve on the UI after window changes and in the DB
+1. can SQL query songs by albumId and display on UI if on album list view
 
 # QA Reminders:
 1. run Main.main() to launch application
@@ -37,7 +41,7 @@ n/a
 n/a
 
 # Before:
-![appRunBefore](resources/Montuno_knownBug.gif)
+![appRunBefore](resources/Montuno_appRunBefore.gif)
 
 # After:
 ![appRunAfter](resources/Montuno_appRunAfter.gif)

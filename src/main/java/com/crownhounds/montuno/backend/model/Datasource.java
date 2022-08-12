@@ -676,6 +676,11 @@ public class Datasource {
         }
     }
 
+    /**
+     * get list of albums by an artist via SQL query to database
+     * @param artistId
+     * @return list of albums
+     */
     public List<Album> queryAlbumsForArtistId(int artistId) {
 
         try {
@@ -821,7 +826,6 @@ public class Datasource {
         }
 
         try {
-
             List<Song> songs = new ArrayList<>();
 
             querySongsByAlbumId.setInt(1, albumId);
@@ -850,6 +854,7 @@ public class Datasource {
             return null;
         }
     }
+
     /**
      * ? THROW EXCEPTION: initiate specific exception with provided error msg
      * <p>

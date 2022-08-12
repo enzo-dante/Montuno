@@ -16,6 +16,15 @@ public class Album {
         this.artistId = new SimpleIntegerProperty();
     }
 
+    @Override
+    public String toString() {
+        return "Album{" +
+                "_id=" + _id +
+                ", name=" + name +
+                ", artistId=" + artistId +
+                '}';
+    }
+
     // OOP getters & setters
     public String getName() {
         return this.name.get();

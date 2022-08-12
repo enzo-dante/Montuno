@@ -3,6 +3,7 @@ package com.crownhounds.montuno.frontend;
 import com.crownhounds.montuno.backend.model.Album;
 import com.crownhounds.montuno.backend.model.Artist;
 import com.crownhounds.montuno.backend.model.Datasource;
+import com.crownhounds.montuno.backend.model.Song;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -22,6 +23,7 @@ public class Controller {
     // CONSTANTS/static class variables assigned FINAL value before compilation/instantiation
     private static final String UPDATED_AC_DC_NAME = "AC/DC (updated name)";
     private static final String NO_ARTIST_SELECTED = "No artist selected";
+    private static final String NO_ALBUM_SELECTED = "No album selected";
 
     /*
         ! these @FXML variables need to have a matching fx:id in the main.fxml file
@@ -45,7 +47,6 @@ public class Controller {
 
         progressBar.setVisible(true);
 
-        handleDeleteSongBtn(task);
         task.setOnSucceeded(event -> progressBar.setVisible(false));
         task.setOnFailed(event -> progressBar.setVisible(false));
     }
@@ -68,6 +69,7 @@ public class Controller {
         artistsTable.itemsProperty().bind(task.valueProperty());
 
         handleProgressBarUpdate(task);
+        listSongsForAlbum.setVisible(false);
 
         // use new Thread to start task and make SQL queries on db
         new Thread(task).start();
@@ -87,7 +89,9 @@ public class Controller {
             return false;
         }
 
-        // anonymous class
+        listSongsForAlbum.setVisible(true);
+
+        // ! ANONYMOUS INNER CLASS:
         Task<ObservableList<Album>> task = new Task<>() {
             @Override
             protected ObservableList<Album> call() throws Exception {
@@ -113,6 +117,42 @@ public class Controller {
     @FXML
     public boolean listSongsForAlbum() {
 
+        // ! CASTING: converting one dataType to a compatible target dataType
+        final Album src = (Album) artistsTable.getSelectionModel().getSelectedItem();
+
+        if(src == null) {
+            System.out.println(NO_ALBUM_SELECTED);
+            return false;
+        }
+
+        // ? NEED TO FIX: return is mapped incorrectly to a compatible target dataType
+        int album_id = src.getArtistId();
+        String albumName = src.getName();
+        int artistId = src.get_id();
+
+        Album album = new Album();
+        album.set_id(album_id);
+        album.setName(albumName);
+        album.setArtistId(artistId);
+
+        // ! ANONYMOUS INNER CLASS:
+        Task<ObservableList<Song>> task = new Task<>() {
+            @Override
+            protected ObservableList<Song> call() throws Exception {
+
+                Datasource datasource = Datasource.getDatasourceInstance();
+                List<Song> songs = datasource.querySongsByAlbumId(album.get_id());
+
+                return FXCollections.observableArrayList(songs);
+            }
+        };
+
+        // update UI by populating it with db query data on new thread
+        artistsTable.itemsProperty().bind(task.valueProperty());
+        listSongsForAlbum.setVisible(false);
+
+        // use new Thread to start task and make SQL queries on db
+        new Thread(task).start();
         return true;
     }
 
