@@ -4,12 +4,14 @@ import com.crownhounds.montuno.backend.model.Album;
 import com.crownhounds.montuno.backend.model.Artist;
 import com.crownhounds.montuno.backend.model.Datasource;
 import com.crownhounds.montuno.backend.model.Song;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import java.util.List;
@@ -21,9 +23,22 @@ import java.util.List;
 public class Controller {
 
     // CONSTANTS/static class variables assigned FINAL value before compilation/instantiation
+    private static final String NOT_IMPLEMENTED_FAIL = "Test failure due to not being implemented";
+    private static final String MONTUNO_ARTISTS = "Montuno Artists";
+    private static final String MONTUNO_ARTIST_ALBUMS = " Albums";
+    private static final String MONTUNO_ARTIST_ALBUM_SONGS = " Songs";
     private static final String UPDATED_AC_DC_NAME = "AC/DC (updated name)";
     private static final String NO_ARTIST_SELECTED = "No artist selected";
     private static final String NO_ALBUM_SELECTED = "No album selected";
+    private static final String SEMICOLON= ";";
+    private static final String CSS_FX_BACKGROUND_COLOR = "-fx-background-color: ";
+    private static final String CSS_FX_TEXT_COLOR = "-fx-text-fill: ";
+    private static final String CSS_EXIT = CSS_FX_BACKGROUND_COLOR + "red" + SEMICOLON +
+            CSS_FX_TEXT_COLOR + "white" + SEMICOLON;
+
+    // OOP ENCAPSULATION private class fields
+    private Artist artistSource;
+    private Album albumSource;
 
     /*
         ! these @FXML variables need to have a matching fx:id in the main.fxml file
@@ -33,13 +48,20 @@ public class Controller {
      */
     @FXML
     private TableView artistsTable;
-
+    @FXML
+    private Button deleteSongForAlbum;
+    @FXML
+    private Button exit;
+    @FXML
+    private Button listSongsForAlbum;
+    @FXML
+    private Button listAlbumsForArtist;
     @FXML
     private ProgressBar progressBar;
     @FXML
-    private Button deleteSongBtn;
+    private TableColumn tableColumnMain;
     @FXML
-    private Button listSongsForAlbum;
+    private Button updateArtistName;
 
     private void handleProgressBarUpdate(Task task) {
         // using lambda expressions to manage visibility of progress bar regardless of success or failure
@@ -51,14 +73,6 @@ public class Controller {
         task.setOnFailed(event -> progressBar.setVisible(false));
     }
 
-    private void handleDeleteSongBtn(Task task) {
-
-    }
-
-    private void handleListSongsForAlbum(Task task) {
-
-    }
-
     /**
      * This is the method which handles the event from the main.fxml file for listing all artists on the UI.
      */
@@ -68,11 +82,35 @@ public class Controller {
 
         artistsTable.itemsProperty().bind(task.valueProperty());
 
-        handleProgressBarUpdate(task);
-        listSongsForAlbum.setVisible(false);
+        setListArtistsState(task);
 
         // use new Thread to start task and make SQL queries on db
         new Thread(task).start();
+    }
+
+    private void setListArtistsState(Task task) {
+        handleProgressBarUpdate(task);
+        listAlbumsForArtist.setVisible(true);
+        listSongsForAlbum.setVisible(false);
+        deleteSongForAlbum.setVisible(false);
+        exit.setStyle(CSS_EXIT);
+        tableColumnMain.setText(MONTUNO_ARTISTS);
+        artistSource = null;
+        albumSource = null;
+    }
+
+    private void setListAlbumsForArtistState(Task task) {
+        listAlbumsForArtist.setVisible(false);
+        updateArtistName.setVisible(false);
+        listSongsForAlbum.setVisible(true);
+        deleteSongForAlbum.setVisible(false);
+        tableColumnMain.setText(artistSource.getName() + MONTUNO_ARTIST_ALBUMS);
+    }
+
+    private void setListSongsForAlbumState(Task task) {
+        listSongsForAlbum.setVisible(false);
+        deleteSongForAlbum.setVisible(true);
+        tableColumnMain.setText(albumSource.getName() + MONTUNO_ARTIST_ALBUM_SONGS);
     }
 
     /**
@@ -83,13 +121,12 @@ public class Controller {
 
         // ! CASTING: converting one dataType to a compatible target dataType
         final Artist artist = (Artist) artistsTable.getSelectionModel().getSelectedItem();
+        artistSource = artist;
 
         if(artist == null) {
             System.out.println(NO_ARTIST_SELECTED);
             return false;
         }
-
-        listSongsForAlbum.setVisible(true);
 
         // ! ANONYMOUS INNER CLASS:
         Task<ObservableList<Album>> task = new Task<>() {
@@ -105,6 +142,8 @@ public class Controller {
 
         // update UI by populating it with db query data on new thread
         artistsTable.itemsProperty().bind(task.valueProperty());
+
+        setListAlbumsForArtistState(task);
 
         // use new Thread to start task and make SQL queries on db
         new Thread(task).start();
@@ -135,6 +174,8 @@ public class Controller {
         album.setName(albumName);
         album.setArtistId(artistId);
 
+        albumSource = album;
+
         // ! ANONYMOUS INNER CLASS:
         Task<ObservableList<Song>> task = new Task<>() {
             @Override
@@ -149,7 +190,8 @@ public class Controller {
 
         // update UI by populating it with db query data on new thread
         artistsTable.itemsProperty().bind(task.valueProperty());
-        listSongsForAlbum.setVisible(false);
+
+        setListSongsForAlbumState(task);
 
         // use new Thread to start task and make SQL queries on db
         new Thread(task).start();
@@ -162,7 +204,13 @@ public class Controller {
     @FXML
     public boolean deleteSongFromAlbum() {
 
+        System.out.println(NOT_IMPLEMENTED_FAIL);
         return true;
+    }
+
+    @FXML
+    public void exit() {
+        Platform.exit();
     }
 
     /**
