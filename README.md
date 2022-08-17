@@ -3,16 +3,17 @@
 ![appRunAfter](resources/Montuno_appRunAfter.gif)
 
 ### frontend
-1. for Controller.java, added missing @FXML id listSongsForAlbum to resolve app breaking on startup
-2. for main.fxml & Controller.java, added @FXML id listAlbumsForArtist, updateArtistName, deleteSongForAlbum, exit to display appropriate buttons for dynamic page rendering 
-3. for Controller.java, added artistSource & albumSource to display respective names for dynamic page rendering 
-4. for main.fxml & Controller.java, added exit() button with basic css styling + CONSTANTS
+1. for Controller.java, added _showMessageDialog() & showMessageDialog() that will render popup window
+2. for Controller.java, added error CONSTANTS
+3. for Controller.java, called showMessageDialog() in listSongForAlbum(), listAlbumsForArtist(), listArtists()  
+4. for Main.java, called showMessageDialog() in init() 
+5. started dialogs.css file
 
 ### backend
 n/a: no PR changes
 
 # Functional Impacts:
-1. resolve app breaking on startup & started implementing dynamic page rendering
+1. render informative popup dialog on error button clicks when nothing is selected or error starting app 
 
 # QA Reminders:
 1. In Datasource.java, variable CONNECTION_STRING must match your local directory path
@@ -22,6 +23,7 @@ n/a: no PR changes
 5. there is a music_original.db backup file in resources dir if music.db is corrupted via testing 
 
 FUTURE STORY: currently, app manually creates an Album for UI because return src model is automatically Artist object and when cast as model is mapped incorrectly to a compatible target dataType
+
 FUTURE STORY: currently, app requires user to manually change Datasource.java CONNECTION_STRING to match local directory path
 
 # Acceptance Criteria:

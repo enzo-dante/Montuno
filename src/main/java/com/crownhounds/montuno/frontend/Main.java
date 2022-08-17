@@ -4,6 +4,7 @@ import com.crownhounds.montuno.backend.model.Datasource;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -48,8 +49,7 @@ public class Main extends Application {
         Datasource.getDatasourceInstance().open();
 
         if(!Datasource.getDatasourceInstance().open()) {
-            // implement popup dialog
-            System.out.println(FATAL_ERROR);
+            Controller.showMessageDialog(null, FATAL_ERROR, MONTUNO_TITLE, AlertType.ERROR, null);
 
             // do not let user interact with application
             Platform.exit();

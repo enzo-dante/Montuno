@@ -9,10 +9,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.scene.text.Text;
+import javafx.stage.Window;
 
 import java.util.List;
 
@@ -24,17 +25,24 @@ public class Controller {
 
     // CONSTANTS/static class variables assigned FINAL value before compilation/instantiation
     private static final String NOT_IMPLEMENTED_FAIL = "Test failure due to not being implemented";
+    private static final String ERROR_TITLE = "ERROR";
+    private static final String ERROR_NO_ARTIST_SELECTED = "No artist selected";
+    private static final String ERROR_NO_ALBUM_SELECTED = "No album selected";
     private static final String MONTUNO_ARTISTS = "Montuno Artists";
     private static final String MONTUNO_ARTIST_ALBUMS = " Artist Albums";
     private static final String MONTUNO_ARTIST_ALBUM_SONGS = " Album Songs";
     private static final String UPDATED_AC_DC_NAME = "AC/DC (updated name)";
-    private static final String NO_ARTIST_SELECTED = "No artist selected";
-    private static final String NO_ALBUM_SELECTED = "No album selected";
     private static final String SEMICOLON= ";";
-    private static final String CSS_FX_BACKGROUND_COLOR = "-fx-background-color: ";
-    private static final String CSS_FX_TEXT_COLOR = "-fx-text-fill: ";
-    private static final String CSS_EXIT = CSS_FX_BACKGROUND_COLOR + "red" + SEMICOLON +
-            CSS_FX_TEXT_COLOR + "white" + SEMICOLON;
+    private static final String CSS_FX_BACKGROUND_COLOR = " -fx-background-color: ";
+    private static final String CSS_FX_PADDING = " -fx-padding: ";
+    private static final String CSS_FX_PADDING_DIMENSIONS = "0 10px 0 10px";
+    private static final String CSS_FX_TEXT_COLOR = " -fx-text-fill: ";
+    private static final String CSS_FX_FONT_FAMILY = " -fx-font-family: ";
+    private static final String CSS_FONT_MONOSPACE = "monospace";
+    private static final String CSS_COLOR_RED = "red";
+    private static final String CSS_COLOR_WHITE = "white";
+    private static final String CSS_EXIT = CSS_FX_BACKGROUND_COLOR + CSS_COLOR_RED + SEMICOLON +
+            CSS_FX_TEXT_COLOR + CSS_COLOR_WHITE + SEMICOLON;
 
     // OOP ENCAPSULATION private class fields
     private Artist artistSource;
@@ -125,7 +133,7 @@ public class Controller {
         artistSource = artist;
 
         if(artist == null) {
-            System.out.println(NO_ARTIST_SELECTED);
+            Controller.showMessageDialog(null, ERROR_NO_ARTIST_SELECTED, ERROR_TITLE, AlertType.ERROR, null);
             return false;
         }
 
@@ -161,7 +169,7 @@ public class Controller {
         final Album src = (Album) artistsTable.getSelectionModel().getSelectedItem();
 
         if(src == null) {
-            System.out.println(NO_ALBUM_SELECTED);
+            Controller.showMessageDialog(null, ERROR_NO_ALBUM_SELECTED, ERROR_TITLE, AlertType.ERROR, null);
             return false;
         }
 
@@ -205,7 +213,7 @@ public class Controller {
     @FXML
     public boolean deleteSongFromAlbum() {
 
-        System.out.println(NOT_IMPLEMENTED_FAIL);
+        Controller.showMessageDialog(null, NOT_IMPLEMENTED_FAIL, ERROR_TITLE, AlertType.ERROR, null);
         return true;
     }
 
@@ -242,6 +250,54 @@ public class Controller {
 
         // use new Thread to start task and make SQL queries on db
         new Thread(task).start();
+    }
+
+    private static void _showMessageDialog(Window parent, String message, String title, AlertType type, String font) {
+
+        Alert alert = new Alert(type);
+        DialogPane dialogPane = alert.getDialogPane();
+
+        alert.initOwner(parent);
+        alert.setTitle(title);
+        alert.setHeaderText(title);
+        alert.setContentText(message);
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.setResizable(false);
+
+        dialogPane.setFocusTraversable(true);
+
+        if (font != null) {
+            Text text = new Text(message);
+            text.setStyle(CSS_FX_FONT_FAMILY + font + SEMICOLON);
+
+            dialogPane.setStyle(CSS_FX_PADDING + CSS_FX_PADDING_DIMENSIONS + SEMICOLON);
+            dialogPane.contentProperty().set(text);
+        }
+        alert.showAndWait();
+    }
+
+     public static void showMessageDialog(Window parent, String message, String title, AlertType type, String font) {
+
+         System.out.println(message);
+
+         if (Platform.isFxApplicationThread()) {
+             _showMessageDialog(parent, message, title, type, font);
+         } else {
+             Object lock = new Object();
+             synchronized (lock) {
+                 Platform.runLater(() -> {
+                     _showMessageDialog(parent, message, title, type, font);
+                     lock.notifyAll();
+                 });
+             }
+             synchronized (lock) {
+                 try {
+                     lock.wait();
+                 } catch (InterruptedException e) {
+                     e.printStackTrace();
+                 }
+             }
+         }
     }
 }
 
