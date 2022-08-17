@@ -7,6 +7,12 @@ import java.util.List;
 public class Datasource {
 
     // CONSTANTS/static class variables assigned FINAL value before compilation/instantiation
+    public static final String DB_NAME = "music.db";
+    public static final String CONNECTION_STRING = "jdbc:sqlite:/Users/enzo_dante/git/Montuno/" + DB_NAME;
+
+    public static final String NO_CONNECTION = "Couldn't connect to database...\n";
+    public static final String CLOSE_CONNECTION_FAIL = "Couldn't close() database...\n";
+
     private static final String QUERY_FAILED = "Query failed: ";
     private static final String UPDATE_FAILED = "Update failed: ";
     private static final String DELETE_FAILED = "Delete failed: ";
@@ -33,12 +39,6 @@ public class Datasource {
     // ? ResultSet columns start at 1 and not 0
     private static final int SQL_START_INDEX = 1;
     private static final String META_DATA_FORMAT = "Column %d in the songs table is names %s\n";
-
-    public static final String DB_NAME = "music.db";
-    public static final String CONNECTION_STRING = "jdbc:sqlite:/Users/enzo_dante/git/Montuno/" + DB_NAME;
-
-    public static final String NO_CONNECTION = "Couldn't connect to database...\n";
-    public static final String CLOSE_CONNECTION_FAIL = "Couldn't close() database...\n";
 
     public static final String TABLE_ALBUMS = "albums";
     public static final String COLUMN_ALBUMS_ID = "_id";

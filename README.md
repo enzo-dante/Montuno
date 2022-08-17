@@ -15,11 +15,14 @@ n/a: no PR changes
 1. resolve app breaking on startup & started implementing dynamic page rendering
 
 # QA Reminders:
-1. run Main.main() to launch application
-2. use DB Browser for SQLite app for database viewing
-3. there is a music_original.db backup file in resources dir if music.db is corrupted via testing 
+1. In Datasource.java, variable CONNECTION_STRING must match your local directory path
+2. run DatasourceTest first before launching app 
+3. run Main.main() to launch application 
+4. use DB Browser for SQLite app for database viewing 
+5. there is a music_original.db backup file in resources dir if music.db is corrupted via testing 
 
-FUTURE STORY FIX: had to manually create an Album for UI because return src model is automatically Artist object and when cast as model is mapped incorrectly to a compatible target dataType
+FUTURE STORY: currently, app manually creates an Album for UI because return src model is automatically Artist object and when cast as model is mapped incorrectly to a compatible target dataType
+FUTURE STORY: currently, app requires user to manually change Datasource.java CONNECTION_STRING to match local directory path
 
 # Acceptance Criteria:
 1. write an MVP that can get data from a SQLite3 DB and update the frontend & backend

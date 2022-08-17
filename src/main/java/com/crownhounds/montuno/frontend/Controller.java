@@ -25,8 +25,8 @@ public class Controller {
     // CONSTANTS/static class variables assigned FINAL value before compilation/instantiation
     private static final String NOT_IMPLEMENTED_FAIL = "Test failure due to not being implemented";
     private static final String MONTUNO_ARTISTS = "Montuno Artists";
-    private static final String MONTUNO_ARTIST_ALBUMS = " Albums";
-    private static final String MONTUNO_ARTIST_ALBUM_SONGS = " Songs";
+    private static final String MONTUNO_ARTIST_ALBUMS = " Artist Albums";
+    private static final String MONTUNO_ARTIST_ALBUM_SONGS = " Album Songs";
     private static final String UPDATED_AC_DC_NAME = "AC/DC (updated name)";
     private static final String NO_ARTIST_SELECTED = "No artist selected";
     private static final String NO_ALBUM_SELECTED = "No album selected";
@@ -91,6 +91,7 @@ public class Controller {
     private void setListArtistsState(Task task) {
         handleProgressBarUpdate(task);
         listAlbumsForArtist.setVisible(true);
+        updateArtistName.setVisible(true);
         listSongsForAlbum.setVisible(false);
         deleteSongForAlbum.setVisible(false);
         exit.setStyle(CSS_EXIT);
