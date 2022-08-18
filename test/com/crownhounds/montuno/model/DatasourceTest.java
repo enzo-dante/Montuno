@@ -9,23 +9,10 @@ import org.junit.jupiter.api.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static com.crownhounds.montuno.strings.Tests.*;
+import static com.crownhounds.montuno.strings.SQL.*;
 
 class DatasourceTest {
-
-    // CONSTANTS/static class variables assigned FINAL value before compilation/instantiation
-    private static final String NOT_IMPLEMENTED_FAIL = "Test failure due to not being implemented";
-    private static final String BEFORE_ALL_TESTS = "Before all tests";
-    private static final String AFTER_ALL_TESTS = "After all tests";
-    private static final String TEST = "TEST";
-    private static final String TEST_DIVIDER = "----------------";
-    private static final String TEST_ARTIST_IRON_MAIDEN = "Iron Maiden";
-    private static final String TEST_ARTIST_GRATEFUL_DEAD = "Grateful Dead";
-
-    private static final String TEST_SONG_HEARTLESS = "Heartless";
-    private static final String TEST_SONG_TOUCH_GREY = "Touch of Grey";
-
-    private static final String TEST_ALBUM_IN_THE_DARK = "In The Dark";
-    private static final int SORT_ORDER_NULL = 5;
 
     // OOP ENCAPSULATION private class fields
     Datasource datasource;
@@ -79,7 +66,7 @@ class DatasourceTest {
 
     @Test
     void queryArtist_success() {
-        List<Artist> artists = datasource.queryArtist(Datasource.ORDER_BY_NONE);
+        List<Artist> artists = datasource.queryArtist(ORDER_BY_NONE);
         assertNotNull(artists);
 
         System.out.println(TEST_DIVIDER);
@@ -89,7 +76,7 @@ class DatasourceTest {
 
     @Test
     void queryArtist_asc() {
-        List<Artist> artists = datasource.queryArtist(Datasource.ORDER_BY_ASC);
+        List<Artist> artists = datasource.queryArtist(ORDER_BY_ASC);
         assertNotNull(artists);
 
         Datasource.printArtists(artists);
@@ -97,7 +84,7 @@ class DatasourceTest {
 
     @Test
     void queryArtist_desc() {
-        List<Artist> artists = datasource.queryArtist(Datasource.ORDER_BY_DESC);
+        List<Artist> artists = datasource.queryArtist(ORDER_BY_DESC);
         assertNotNull(artists);
 
         Datasource.printArtists(artists);
@@ -111,15 +98,15 @@ class DatasourceTest {
 
     @Test
     void queryAlbumsForArtist_success() {
-        List<String> albums = datasource.queryAlbumsForArtist(TEST_ARTIST_IRON_MAIDEN, Datasource.ORDER_BY_DESC);
+        List<String> albums = datasource.queryAlbumsForArtist(TEST_ARTIST_IRON_MAIDEN, ORDER_BY_DESC);
         assertNotNull(albums);
     }
 
     @Test
     void handleSort_null() {
-        StringBuilder sb = new StringBuilder(Datasource.QUERY_ALBUMS_BY_ARTIST_START);
+        StringBuilder sb = new StringBuilder(QUERY_ALBUMS_BY_ARTIST_START);
         sb.append(datasource.formatField(TEST_ARTIST_IRON_MAIDEN));
-        sb = Datasource.handleSort(sb, SORT_ORDER_NULL, Datasource.QUERY_ALBUMS_BY_ARTIST_SORT);
+        sb = Datasource.handleSort(sb, SORT_ORDER_NULL, QUERY_ALBUMS_BY_ARTIST_SORT);
         assertNull(sb);
     }
 
@@ -161,7 +148,7 @@ class DatasourceTest {
 
     @Test
     void getCount_success() {
-        int actualResult = datasource.getCount(Datasource.TABLE_SONGS);
+        int actualResult = datasource.getCount(TABLE_SONGS);
         int expectedResult = 5350;
         assertEquals(expectedResult, actualResult);
     }
@@ -180,7 +167,7 @@ class DatasourceTest {
 
     @Test
     void queryArtistsForSong_success() {
-        List<SongArtist> songArtists = datasource.queryArtistsForSong(TEST_SONG_HEARTLESS, Datasource.ORDER_BY_DESC);
+        List<SongArtist> songArtists = datasource.queryArtistsForSong(TEST_SONG_HEARTLESS, ORDER_BY_DESC);
         assertNotNull(songArtists);
 
         System.out.println(TEST_DIVIDER);
@@ -189,7 +176,7 @@ class DatasourceTest {
 
     @Test
     void queryArtistsForSong_badInputSong() {
-        List<SongArtist> songArtists = datasource.queryArtistsForSong(TEST, Datasource.ORDER_BY_DESC);
+        List<SongArtist> songArtists = datasource.queryArtistsForSong(TEST, ORDER_BY_DESC);
         assertNull(songArtists);
     }
 

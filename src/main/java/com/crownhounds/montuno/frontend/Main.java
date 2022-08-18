@@ -4,20 +4,17 @@ import com.crownhounds.montuno.backend.model.Datasource;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import static com.crownhounds.montuno.strings.Errors.FATAL_ERROR;
+import static com.crownhounds.montuno.strings.UI.*;
 
 public class Main extends Application {
-
-    // CONSTANTS/static class variables assigned FINAL value before compilation/instantiation
-    private static final String MONTUNO_TITLE = "Montuno";
-    private static final String MAIN_FILE = "main.fxml";
-    private static final String FATAL_ERROR = "FATAL ERROR: Couldn't connect to database";
 
     /**
      * validate UI has compiled successfully before querying and loading artists into table view
@@ -49,6 +46,7 @@ public class Main extends Application {
         Datasource.getDatasourceInstance().open();
 
         if(!Datasource.getDatasourceInstance().open()) {
+
             Controller.showMessageDialog(null, FATAL_ERROR, MONTUNO_TITLE, AlertType.ERROR, null);
 
             // do not let user interact with application

@@ -3,20 +3,16 @@
 ![appRunAfter](resources/Montuno_appRunAfter.gif)
 
 ### frontend
-1. for Controller.java, added _showMessageDialog() & showMessageDialog() that will render popup window
-2. for Controller.java, added error CONSTANTS
-3. for Controller.java, called showMessageDialog() in listSongForAlbum(), listAlbumsForArtist(), listArtists()  
-4. for Main.java, called showMessageDialog() in init() 
-5. started dialogs.css file
+1. centralized all constant strings into strings package and created respective classes for individual string references
 
 ### backend
-n/a: no PR changes
+1. centralized all constant strings into strings package and created respective classes for individual string references
 
 # Functional Impacts:
-1. render informative popup dialog on error button clicks when nothing is selected or error starting app 
+1. code readability & scalability improved 
 
 # QA Reminders:
-1. In Datasource.java, variable CONNECTION_STRING must match your local directory path
+1. In strings.SQL file, the variable CONNECTION_PATH must match your local directory path to the music.db file
 2. run DatasourceTest first before launching app 
 3. run Main.main() to launch application 
 4. use DB Browser for SQLite app for database viewing 
@@ -24,7 +20,7 @@ n/a: no PR changes
 
 FUTURE STORY: currently, app manually creates an Album for UI because return src model is automatically Artist object and when cast as model is mapped incorrectly to a compatible target dataType
 
-FUTURE STORY: currently, app requires user to manually change Datasource.java CONNECTION_STRING to match local directory path
+FUTURE STORY: currently, app requires user to manually change strings.SQL CONNECTION_PATH to match local directory path
 
 # Acceptance Criteria:
 1. write an MVP that can get data from a SQLite3 DB and update the frontend & backend

@@ -16,6 +16,11 @@ import javafx.scene.text.Text;
 import javafx.stage.Window;
 
 import java.util.List;
+import static com.crownhounds.montuno.strings.SQL.ORDER_BY_ASC;
+import static com.crownhounds.montuno.strings.CSS.*;
+import static com.crownhounds.montuno.strings.UI.*;
+import static com.crownhounds.montuno.strings.Errors.*;
+import static com.crownhounds.montuno.strings.Tests.NOT_IMPLEMENTED_FAIL;
 
 /**
  * always run the SQL query on a background thread using a Task
@@ -24,25 +29,7 @@ import java.util.List;
 public class Controller {
 
     // CONSTANTS/static class variables assigned FINAL value before compilation/instantiation
-    private static final String NOT_IMPLEMENTED_FAIL = "Test failure due to not being implemented";
-    private static final String ERROR_TITLE = "ERROR";
-    private static final String ERROR_NO_ARTIST_SELECTED = "No artist selected";
-    private static final String ERROR_NO_ALBUM_SELECTED = "No album selected";
-    private static final String MONTUNO_ARTISTS = "Montuno Artists";
-    private static final String MONTUNO_ARTIST_ALBUMS = " Artist Albums";
-    private static final String MONTUNO_ARTIST_ALBUM_SONGS = " Album Songs";
     private static final String UPDATED_AC_DC_NAME = "AC/DC (updated name)";
-    private static final String SEMICOLON= ";";
-    private static final String CSS_FX_BACKGROUND_COLOR = " -fx-background-color: ";
-    private static final String CSS_FX_PADDING = " -fx-padding: ";
-    private static final String CSS_FX_PADDING_DIMENSIONS = "0 10px 0 10px";
-    private static final String CSS_FX_TEXT_COLOR = " -fx-text-fill: ";
-    private static final String CSS_FX_FONT_FAMILY = " -fx-font-family: ";
-    private static final String CSS_FONT_MONOSPACE = "monospace";
-    private static final String CSS_COLOR_RED = "red";
-    private static final String CSS_COLOR_WHITE = "white";
-    private static final String CSS_EXIT = CSS_FX_BACKGROUND_COLOR + CSS_COLOR_RED + SEMICOLON +
-            CSS_FX_TEXT_COLOR + CSS_COLOR_WHITE + SEMICOLON;
 
     // OOP ENCAPSULATION private class fields
     private Artist artistSource;
@@ -312,7 +299,7 @@ class GetAllArtistsTask extends Task {
     public ObservableList<Artist> call() {
 
         Datasource datasource = Datasource.getDatasourceInstance();
-        List<Artist> artists = datasource.queryArtist(Datasource.ORDER_BY_ASC);
+        List<Artist> artists = datasource.queryArtist(ORDER_BY_ASC);
 
         return FXCollections.observableArrayList(artists);
     }
