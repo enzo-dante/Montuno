@@ -32,4 +32,5 @@ public class Errors {
     public static final String ERROR_TITLE = "ERROR";
     public static final String ERROR_NO_ARTIST_SELECTED = "No artist selected";
     public static final String ERROR_NO_ALBUM_SELECTED = "No album selected";
+    public static final String ERROR_NO_SONG_SELECTED = "No song selected";
 }

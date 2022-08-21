@@ -9,18 +9,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.*;
-import javafx.stage.Modality;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Window;
 
 import java.util.List;
-import static com.crownhounds.montuno.strings.SQL.ORDER_BY_ASC;
+
 import static com.crownhounds.montuno.strings.CSS.*;
-import static com.crownhounds.montuno.strings.UI.*;
 import static com.crownhounds.montuno.strings.Errors.*;
-import static com.crownhounds.montuno.strings.Tests.NOT_IMPLEMENTED_FAIL;
+import static com.crownhounds.montuno.strings.SQL.ORDER_BY_ASC;
+import static com.crownhounds.montuno.strings.UI.*;
 
 /**
  * always run the SQL query on a background thread using a Task
@@ -195,12 +195,55 @@ public class Controller {
     }
 
     /**
-     * This is the method which handles the event from the main.fxml file for listing all albums by artist name on the UI.
+     * This is the method which handles the event from the main.fxml file for deleting a song from an album from the database & UI.
      */
     @FXML
     public boolean deleteSongFromAlbum() {
 
-        Controller.showMessageDialog(null, NOT_IMPLEMENTED_FAIL, ERROR_TITLE, AlertType.ERROR, null);
+        // ! CASTING: converting dataType to another compatible dataType
+        final Song song = (Song) artistsTable.getSelectionModel().getSelectedItem();
+
+        if(song == null) {
+            Controller.showMessageDialog(null, ERROR_NO_SONG_SELECTED, ERROR_TITLE, AlertType.ERROR, null);
+            return false;
+        }
+
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() throws Exception {
+                Datasource datasource = Datasource.getDatasourceInstance();
+                return datasource.deleteSong(song.getName(), artistSource.getName());
+            }
+        };
+
+        // if task succeeds, then update UI to match updated record in the db on its own thread
+        task.setOnSucceeded(event -> {
+            if(task.valueProperty().get()) {
+
+                // ! ANONYMOUS INNER CLASS:
+                Task<ObservableList<Song>> task2 = new Task<>() {
+                    @Override
+                    protected ObservableList<Song> call() throws Exception {
+
+                        Datasource datasource = Datasource.getDatasourceInstance();
+                        List<Song> songs = datasource.querySongsByAlbumId(albumSource.get_id());
+
+                        return FXCollections.observableArrayList(songs);
+                    }
+                };
+
+                // update UI by populating it with db query data on new thread
+                artistsTable.itemsProperty().bind(task2.valueProperty());
+
+                setListSongsForAlbumState(task2);
+
+                // use new Thread to start task and make SQL queries on db
+                new Thread(task2).start();
+            }
+        });
+
+        // use new Thread to start task and make SQL queries on db
+        new Thread(task).start();
         return true;
     }
 
@@ -214,7 +257,8 @@ public class Controller {
      */
     @FXML
     public void updateArtistName() {
-        // get SQL record that is cast as an Artist class
+
+        // ! CASTING: converting dataType to another compatible dataType
         final Artist artist = (Artist) artistsTable.getItems().get(2);
 
         Task<Boolean> task = new Task<>() {

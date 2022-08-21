@@ -40,7 +40,7 @@ class DatasourceTest {
 
     @AfterEach
     void tearDown() {
-        isOpen = datasource.close();
+        isClosed = datasource.close();
     }
 
     @Test

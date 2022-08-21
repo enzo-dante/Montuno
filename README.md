@@ -3,13 +3,15 @@
 ![appRunAfter](resources/Montuno_appRunAfter.gif)
 
 ### frontend
-1. centralized all constant strings into strings package and created respective classes for individual string references
+1. In Controller.java, added logic that will handle the task of deleting from db and onSucceeded, the task of updating the UI album songs table  
+2. Defined & setup ControllerTest
 
 ### backend
-1. centralized all constant strings into strings package and created respective classes for individual string references
+1. In Errors.java, added ERROR_NO_SONG_SELECTED string 
 
 # Functional Impacts:
-1. code readability & scalability improved 
+1. can delete a song based on its artist and album from the DB and UI
+2. if no song is selected when the songs are listed per album, an error modal will pop up
 
 # QA Reminders:
 1. In strings.SQL file, the variable CONNECTION_PATH must match your local directory path to the music.db file
@@ -17,10 +19,6 @@
 3. run Main.main() to launch application 
 4. use DB Browser for SQLite app for database viewing 
 5. there is a music_original.db backup file in resources dir if music.db is corrupted via testing 
-
-FUTURE STORY: currently, app manually creates an Album for UI because return src model is automatically Artist object and when cast as model is mapped incorrectly to a compatible target dataType
-
-FUTURE STORY: currently, app requires user to manually change strings.SQL CONNECTION_PATH to match local directory path
 
 # Acceptance Criteria:
 1. write an MVP that can get data from a SQLite3 DB and update the frontend & backend
@@ -46,4 +44,18 @@ n/a
 
 # After:
 ![appRunAfter](resources/Montuno_appRunAfter.gif)
+
+# Kanban Board: 
+
+1. currently, app manually creates an Album for UI because return src model is automatically Artist object and when cast as model is mapped incorrectly to a compatible target dataType
+
+2. currently, app requires user to manually change strings.SQL CONNECTION_PATH to match local directory path
+
+3. create an addSong backend function to make testing easier for delete functionality
+
+4. write out logic for ControllerTest tests
+
+5. modularize backend functions by class instead of having them all in Datasource.java
+
+6. add a UI playlist that uses a LinkedList 
 
