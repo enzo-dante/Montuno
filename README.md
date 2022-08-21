@@ -47,15 +47,21 @@ n/a
 
 # Kanban Board: 
 
-1. currently, app manually creates an Album for UI because return src model is automatically Artist object and when cast as model is mapped incorrectly to a compatible target dataType
+### TO-DO
 
-2. currently, app requires user to manually change strings.SQL CONNECTION_PATH to match local directory path
+US0008-currently, app manually creates an Album for UI because return src model is automatically Artist object and when cast as model is mapped incorrectly to a compatible target dataType
 
-3. create an addSong backend function to make testing easier for delete functionality
+US0009-currently, app requires user to manually change strings.SQL CONNECTION_PATH to match local directory path
 
-4. write out logic for ControllerTest tests
+US0010-create an addSong backend function to make testing easier for delete functionality
 
-5. modularize backend functions by class instead of having them all in Datasource.java
+US0011-write out logic for ControllerTest tests
 
-6. add a UI playlist that uses a LinkedList 
+US0012-modularize backend functions by class instead of having them all in Datasource.java
+
+US0013-add a UI playlist that uses a LinkedList 
+
+US0014-add user input capture field 
+
+US0015-connect JavaFX to CSS stylesheets
 
