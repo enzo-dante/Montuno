@@ -3,15 +3,15 @@
 ![appRunAfter](resources/Montuno_appRunAfter.gif)
 
 ### frontend
-1. In Controller.java, added logic that will handle the task of deleting from db and onSucceeded, the task of updating the UI album songs table  
-2. Defined & setup ControllerTest
+1. created stylesheets directory with buttons.css & dialogs.css 
+2. in Main.java, defined css file paths and added them to scene.getStylesheets()
+3. in main.fxml, added fx:id listArtists
 
 ### backend
-1. In Errors.java, added ERROR_NO_SONG_SELECTED string 
+1. In CSS.java, defined CONSTANTS: stylesheets path and file names 
 
 # Functional Impacts:
-1. can delete a song based on its artist and album from the DB and UI
-2. if no song is selected when the songs are listed per album, an error modal will pop up
+1. centralize css styles via stylesheets instead of inline style definitions & constants 
 
 # QA Reminders:
 1. In strings.SQL file, the variable CONNECTION_PATH must match your local directory path to the music.db file
@@ -62,6 +62,3 @@ US0012-modularize backend functions by class instead of having them all in Datas
 US0013-add a UI playlist that uses a LinkedList 
 
 US0014-add user input capture field 
-
-US0015-connect JavaFX to CSS stylesheets
-
