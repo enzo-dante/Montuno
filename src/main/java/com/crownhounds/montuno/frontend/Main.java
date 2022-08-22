@@ -11,6 +11,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+
+import static com.crownhounds.montuno.strings.CSS.BUTTONS_FILE;
+import static com.crownhounds.montuno.strings.CSS.DIALOGS_FILE;
 import static com.crownhounds.montuno.strings.Errors.FATAL_ERROR;
 import static com.crownhounds.montuno.strings.UI.*;
 
@@ -32,6 +35,12 @@ public class Main extends Application {
         controller.listArtists();
 
         Scene scene = new Scene(root, 800, 600);
+
+        String cssButtons = this.getClass().getResource(BUTTONS_FILE).toExternalForm();
+        String cssDialogs = this.getClass().getResource(DIALOGS_FILE).toExternalForm();
+        scene.getStylesheets().add(cssButtons);
+        scene.getStylesheets().add(cssDialogs);
+
         stage.setTitle(MONTUNO_TITLE);
         stage.setScene(scene);
         stage.show();

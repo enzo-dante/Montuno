@@ -46,8 +46,6 @@ public class Controller {
     @FXML
     private Button deleteSongForAlbum;
     @FXML
-    private Button exit;
-    @FXML
     private Button listSongsForAlbum;
     @FXML
     private Button listAlbumsForArtist;
@@ -89,7 +87,6 @@ public class Controller {
         updateArtistName.setVisible(true);
         listSongsForAlbum.setVisible(false);
         deleteSongForAlbum.setVisible(false);
-        exit.setStyle(CSS_EXIT);
         tableColumnMain.setText(MONTUNO_ARTISTS);
         artistSource = null;
         albumSource = null;
@@ -299,9 +296,9 @@ public class Controller {
 
         if (font != null) {
             Text text = new Text(message);
-            text.setStyle(CSS_FX_FONT_FAMILY + font + SEMICOLON);
+            text.setStyle(CSS_FX_FONT_FAMILY + font + ";");
 
-            dialogPane.setStyle(CSS_FX_PADDING + CSS_FX_PADDING_DIMENSIONS + SEMICOLON);
+            dialogPane.setStyle(CSS_FX_PADDING + CSS_FX_PADDING_DIMENSIONS + ";");
             dialogPane.contentProperty().set(text);
         }
         alert.showAndWait();
