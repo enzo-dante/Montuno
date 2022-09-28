@@ -13,6 +13,7 @@ public class Errors {
     public static final String DELETE_FAILED_SIZE = DELETE_FAILED + "songArtists.size() != 1";
     public static final String DELETED_SONG_ID = "DELETED song_id: ";
     public static final String DELETED_FOR = " for:\n\t";
+    public static final String CREATE_TABLE_FAILED = "Create Table failed: ";
     public static final String CREATE_VIEW_FAILED = "Create View failed: ";
     public static final String CREATED_VIEW_ARTIST_LIST = "CREATED VIEW: artist_list\n";
     public static final String DROPPED_VIEW_ARTIST_LIST = "DROPPED VIEW: artist_list\n";

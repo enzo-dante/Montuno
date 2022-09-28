@@ -22,13 +22,19 @@ class DatasourceTest {
     @BeforeAll
     static void beforeAll() {
         System.out.println(BEFORE_ALL_TESTS);
+
+        assertTrue(Datasource.dropPlaylistsTable());
+        assertTrue(Datasource.createPlaylistsTable());
+
         assertTrue(Datasource.dropArtistListView());
         assertTrue(Datasource.createArtistListViewForSongArtists());
+
     }
 
     @AfterAll
     static void afterAll() {
         System.out.println(AFTER_ALL_TESTS);
+        assertTrue(Datasource.dropPlaylistsTable());
         assertTrue(Datasource.dropArtistListView());
     }
 

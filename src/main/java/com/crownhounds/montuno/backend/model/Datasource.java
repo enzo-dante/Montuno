@@ -571,6 +571,47 @@ public class Datasource {
     }
 
     /**
+     * create table playlists
+     *
+     * @return if SQL CREATE TABLE query was successful
+     */
+    public static boolean createPlaylistsTable() {
+
+        try(Statement statement = DriverManager.getConnection(CONNECTION_STRING).createStatement()) {
+
+            statement.execute(CREATE_TABLE_PLAYLISTS);
+            statement.close();
+
+            System.out.println(CREATE_TABLE_PLAYLISTS);
+            return true;
+
+        } catch(SQLException e) {
+            System.out.println(CREATE_TABLE_FAILED + e.getMessage());
+            return false;
+        }
+    }
+     /**
+     * drop view artist_list from database
+     * @return SQL query success state
+     */
+    public static boolean dropPlaylistsTable() {
+
+        // ! EXCEPTION HANDLING easier to ask for forgiveness than permission: use try-catch block to handle exceptions
+        try (Statement statement = DriverManager.getConnection(CONNECTION_STRING).createStatement()) {
+
+            statement.execute(DROP_TABLE_PLAYLISTS);
+            statement.close();
+
+            System.out.println(DROP_TABLE_PLAYLISTS);
+            return true;
+
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    /**
      * drop view artist_list from database
      * @return SQL query success state
      */
